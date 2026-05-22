@@ -10,22 +10,50 @@
           <div class="auth-card shadow-lg p-5">
             <h2 class="auth-title mb-4">Login Organizacional</h2>
             
+            <div v-if="erro" class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ erro }}
+              <button type="button" class="btn-close" @click="erro = ''"></button>
+            </div>
+            
             <form @submit.prevent="handleLogin">
               <div class="mb-4">
                 <label class="form-label">Email</label>
-                <input type="email" v-model="email" class="form-control custom-input" placeholder="seu@email.com" required>
+                <input 
+                  type="email" 
+                  v-model="email" 
+                  class="form-control custom-input" 
+                  placeholder="seu@email.com" 
+                  :disabled="carregando"
+                  required
+                >
               </div>
               
               <div class="mb-4">
                 <label class="form-label">Senha</label>
-                <input type="password" v-model="senha" class="form-control custom-input" placeholder="********" required>
+                <input 
+                  type="password" 
+                  v-model="senha" 
+                  class="form-control custom-input" 
+                  placeholder="********" 
+                  :disabled="carregando"
+                  required
+                >
               </div>
               
-              <button type="submit" class="btn btn-dark w-100 py-3 fw-bold mb-3">Entrar</button>
+              <button 
+                type="submit" 
+                :disabled="carregando"
+                class="btn btn-dark w-100 py-3 fw-bold mb-3"
+              >
+                {{ carregando ? 'Entrando...' : 'Entrar' }}
+              </button>
               
-              <div class="d-flex justify-content-between auth-footer">
-                <RouterLink to="/cadastro" class="text-decoration-none text-dark fw-bold">Cadastre Aqui</RouterLink>
-                <a href="#" class="text-decoration-none text-dark opacity-75">Esqueci minha senha</a>
+              <div class="text-center mt-3">
+                <p class="small mb-2 text-dark">Não possui conta?</p>
+                <RouterLink to="/cadastro" class="text-decoration-none text-primary fw-bold">Criar Conta</RouterLink>
+              </div>
+              <div class="text-center mt-2">
+                <a href="#" class="text-decoration-none text-dark opacity-75 small">Esqueci minha senha</a>
               </div>
             </form>
           </div>
@@ -36,60 +64,79 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
-const router = useRouter();
-const email = ref('');
-const senha = ref('');
-const carregando = ref(false);
-const erro = ref('');
+const router = useRouter()
+const { login, carregando: carregandoAuth } = useAuth()
+const email = ref('')
+const senha = ref('')
+const erro = ref('')
+const carregando = ref(false)
 
 const handleLogin = async () => {
   try {
-    carregando.value = true;
-    erro.value = '';
+    erro.value = ''
     
     if (!email.value || !senha.value) {
-      erro.value = 'Email e senha são obrigatórios';
-      return;
+      erro.value = 'Email e senha são obrigatórios'
+      return
     }
     
-    // TODO: Implementar autenticação com API
-    console.log('Tentando login com:', { email: email.value });
+    carregando.value = true
+    const resultado = await login(email.value, senha.value)
     
-    // Simulação de sucesso (remover após integração com API)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Salvar estado de autenticação
-    localStorage.setItem('usuarioLogado', JSON.stringify({
-      email: email.value,
-      dataLogin: new Date().toISOString()
-    }));
-    
-    // Redirecionar para área do especialista
-    router.push('/especialista');
+    if (resultado.sucesso) {
+      const redirectPath = String(router.currentRoute.value.query.redirect || '/especialista')
+      router.push(redirectPath)
+    } else {
+      erro.value = resultado.mensagem
+    }
   } catch (err) {
-    erro.value = 'Erro ao fazer login. Tente novamente.';
-    console.error(err);
+    erro.value = 'Erro ao fazer login. Tente novamente.'
+    console.error(err)
   } finally {
-    carregando.value = false;
+    carregando.value = false
   }
-};
+}
 </script>
 
 <style scoped>
-.login-page { min-height: 100vh; background-color: #f8fafc; }
+.login-page { 
+  min-height: 100vh; 
+  background-color: #f8fafc; 
+}
+
 .auth-card { 
-  background-color: #9cdb81; /* Verde do seu mockup */
+  background-color: #9cdb81;
   border-radius: 40px; 
 }
-.auth-title { font-weight: 700; color: #1e293b; }
+
+.auth-title { 
+  font-weight: 700; 
+  color: #1e293b; 
+}
+
 .custom-input { 
   background: rgba(255,255,255,0.5); 
   border: 1px solid rgba(0,0,0,0.1);
   border-radius: 10px;
   padding: 12px;
 }
-.hero-img { max-width: 80%; }
+
+.custom-input:focus {
+  background-color: #ffffff;
+  border-color: #1e293b;
+  box-shadow: 0 0 0 0.25rem rgba(30, 41, 59, 0.25);
+}
+
+.hero-img { 
+  max-width: 80%; 
+}
+
+.auth-footer {
+  flex-wrap: wrap;
+  gap: 1rem;
+}
 </style>

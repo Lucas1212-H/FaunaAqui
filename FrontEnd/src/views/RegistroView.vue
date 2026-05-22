@@ -10,29 +10,60 @@
           <div class="auth-card shadow-lg p-5">
             <h2 class="auth-title mb-4">Cadastro</h2>
             
+            <div v-if="erro" class="alert alert-danger alert-dismissible fade show" role="alert">
+              {{ erro }}
+              <button type="button" class="btn-close" @click="erro = ''"></button>
+            </div>
+            
             <form @submit.prevent="handleRegister">
               <div class="mb-3">
                 <label class="form-label">Nome Completo</label>
-                <input type="text" v-model="nomeCompleto" class="form-control custom-input" required>
+                <input 
+                  type="text" 
+                  v-model="nomeCompleto" 
+                  class="form-control custom-input" 
+                  :disabled="carregando.value"
+                  required
+                >
               </div>
               
               <div class="mb-3">
                 <label class="form-label">Email Institucional</label>
-                <input type="email" v-model="email" class="form-control custom-input" required>
+                <input 
+                  type="email" 
+                  v-model="email" 
+                  class="form-control custom-input" 
+                  :disabled="carregando.value"
+                  required
+                >
               </div>
               
               <div class="mb-4">
                 <label class="form-label">Senha</label>
-                <input type="password" v-model="senha" class="form-control custom-input" required>
+                <input 
+                  type="password" 
+                  v-model="senha" 
+                  class="form-control custom-input" 
+                  :disabled="carregando.value"
+                  required
+                >
               </div>
               
-              <button type="submit" :disabled="carregando" class="btn btn-dark w-100 py-3 fw-bold mb-3">
-                {{ carregando ? 'Cadastrando...' : 'Cadastrar' }}
+              <button 
+                type="submit" 
+                :disabled="carregando.value" 
+                class="btn btn-dark w-100 py-3 fw-bold mb-3"
+              >
+                {{ carregando.value ? 'Cadastrando...' : 'Cadastrar' }}
               </button>
               
               <div class="text-center auth-footer">
                 <p class="small opacity-75 mb-3">Seu nome de perfil não poderá ser alterado depois, nunca envie senhas.</p>
-                <RouterLink to="/login" class="text-decoration-none text-primary fw-bold">Já possui conta? Clique Aqui</RouterLink>
+                <p class="small">Já possui conta? 
+                  <RouterLink to="/login" class="text-decoration-none text-dark fw-bold">
+                    Volte para Login
+                  </RouterLink>
+                </p>
               </div>
             </form>
           </div>
@@ -43,46 +74,44 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
-const router = useRouter();
-const nomeCompleto = ref('');
-const email = ref('');
-const senha = ref('');
-const carregando = ref(false);
-const erro = ref('');
+const router = useRouter()
+const { register, carregando } = useAuth()
+const nomeCompleto = ref('')
+const email = ref('')
+const senha = ref('')
+const erro = ref('')
 
 const handleRegister = async () => {
   try {
-    carregando.value = true;
-    erro.value = '';
+    erro.value = ''
     
     if (!nomeCompleto.value || !email.value || !senha.value) {
-      erro.value = 'Todos os campos são obrigatórios';
-      return;
+      erro.value = 'Todos os campos são obrigatórios'
+      return
     }
     
     if (senha.value.length < 6) {
-      erro.value = 'Senha deve ter no mínimo 6 caracteres';
-      return;
+      erro.value = 'Senha deve ter no mínimo 6 caracteres'
+      return
     }
     
+    const resultado = await register(nomeCompleto.value, email.value, senha.value)
     
-    console.log('Cadastrando usuário:', { 
-      nomeCompleto: nomeCompleto.value, 
-      email: email.value 
-    });
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    router.push('/login');
+    if (resultado.sucesso) {
+      // Redirecionar para login após cadastro bem-sucedido
+      router.push('/login')
+    } else {
+      erro.value = resultado.mensagem
+    }
   } catch (err) {
-    erro.value = 'Erro ao cadastrar. Tente novamente.';
-    console.error(err);
-  } finally {
-    carregando.value = false;
+    erro.value = 'Erro ao cadastrar. Tente novamente.'
+    console.error(err)
   }
-};
+}
 </script>
 
 <style scoped>

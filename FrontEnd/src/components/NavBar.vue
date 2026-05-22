@@ -6,20 +6,64 @@
 
     <div class="nav-pill-container">
       <div class="nav-pill-bg d-flex align-items-center justify-content-around">
-        <RouterLink to="/especialista" class="nav-item-link active">Início</RouterLink>
-        <a href="#" class="nav-item-link">Arquivados</a>
+        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'triagem' }" @click.prevent="$emit('mudarAba', 'triagem')">Início</a>
+        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'arquivadas' }" @click.prevent="$emit('mudarAba', 'arquivadas')">Denuncias Arquivadas</a>
         <a href="#" class="nav-item-link">Publicados</a>
         <a href="#" class="nav-item-link">Sobre nós</a>
       </div>
     </div>
 
     <div class="user-section">
-      <div class="avatar-circle shadow-sm">
-        <span>A</span>
+      <div class="user-info">
+        <small class="user-name">{{ usuarioLogado?.nome || 'Usuário' }}</small>
+      </div>
+      <div class="dropdown">
+        <button 
+          class="avatar-circle shadow-sm dropdown-toggle" 
+          type="button" 
+          id="userDropdown" 
+          data-bs-toggle="dropdown" 
+          aria-expanded="false"
+        >
+          {{ inicialNome }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li><a class="dropdown-item" href="#">Perfil</a></li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item" href="#" @click.prevent="fazerLogout">Sair</a></li>
+        </ul>
       </div>
     </div>
   </nav>
 </template>
+
+<script setup>
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
+
+defineProps({
+  abaAtiva: {
+    type: String,
+    default: 'triagem'
+  }
+})
+
+defineEmits(['mudarAba'])
+
+const router = useRouter()
+const { usuarioLogado, logout } = useAuth()
+
+const inicialNome = computed(() => {
+  const nome = usuarioLogado.value?.nome || 'U'
+  return nome.charAt(0).toUpperCase()
+})
+
+const fazerLogout = () => {
+  logout()
+  router.push('/')
+}
+</script>
 
 <style scoped>
 .navbar-especialista {
@@ -73,6 +117,24 @@
   color: white !important;
 }
 
+/* User Section */
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  text-align: right;
+}
+
+.user-name {
+  color: white;
+  display: block;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 /* Avatar Circular */
 .avatar-circle {
   width: 50px;
@@ -85,6 +147,29 @@
   font-weight: bold;
   color: #333;
   font-size: 1.2rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.avatar-circle:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+.dropdown-item {
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #9cdb81;
+  color: white;
 }
 
 /* Responsividade básica */
@@ -96,6 +181,9 @@
   .nav-item-link {
     padding: 5px 10px;
     font-size: 0.8rem;
+  }
+  .user-info {
+    display: none;
   }
 }
 </style>

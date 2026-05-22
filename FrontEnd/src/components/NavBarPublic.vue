@@ -9,9 +9,14 @@
 
       <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
         <div class="d-flex gap-3 mt-3 mt-lg-0">
-          <button @click="irParaEspecialista" class="btn nav-btn">Área do Especialista</button>
+          <button @click="irParaEspecialista" class="btn nav-btn">
+            {{ isAutenticado ? 'Minha Área' : 'Área do Especialista' }}
+          </button>
           <RouterLink class="btn nav-btn" to="/sobre">Sobre</RouterLink>
           <RouterLink class="btn nav-btn" to="/contato">Contato</RouterLink>
+          <button v-if="isAutenticado" @click="fazerLogout" class="btn nav-btn btn-logout">
+            Sair
+          </button>
         </div>
       </div>
     </div>
@@ -19,29 +24,26 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 
-const router = useRouter();
-const usuarioLogado = ref(false);
-
-onMounted(() => {
-  // Verificar se há usuário logado no localStorage
-  const usuario = localStorage.getItem('usuarioLogado');
-  usuarioLogado.value = !!usuario;
-});
+const router = useRouter()
+const { isAutenticado, logout } = useAuth()
 
 const irParaEspecialista = () => {
-  const usuario = localStorage.getItem('usuarioLogado');
-  
-  if (usuario) {
-    // Já está logado, vai com direito para a área do especialista
-    router.push('/especialista');
+  if (isAutenticado.value) {
+    // Já está logado, vai direto para a área do especialista
+    router.push('/especialista')
   } else {
-    // Não está logado, vai para login primeiro
-    router.push('/login');
+    // Não está logado, vai para o login primeiro
+    router.push('/login')
   }
-};
+}
+
+const fazerLogout = () => {
+  logout()
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -49,4 +51,6 @@ const irParaEspecialista = () => {
 .logo { color: white; font-weight: 800; font-size: 2rem; text-decoration: none; }
 .nav-btn { background: rgba(0,0,0,0.2); color: white; border-radius: 10px; border: none; transition: 0.3s; }
 .nav-btn:hover { background: rgba(0,0,0,0.4); color: white; }
+.btn-logout { background: rgba(255,0,0,0.3); }
+.btn-logout:hover { background: rgba(255,0,0,0.5); }
 </style>

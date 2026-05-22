@@ -1,195 +1,225 @@
 <template>
-  <div class="min-vh-100 bg-light d-flex align-items-stretch align-items-md-center justify-content-center p-0 p-md-4">
-    
-    <div class="container-fluid bg-white p-0 shadow-lg" style="max-width: 960px; border-radius: 0;">
-      <div class="row g-0 min-vh-100 min-vh-md-0" style="min-height: 550px;">
-        
-        <div class="col-md-5 bg-success text-white p-4 d-none d-md-flex flex-column justify-content-between p-lg-5" style="border-top-left-radius: 16px; border-bottom-left-radius: 16px;">
-          <div>
-            <div class="d-flex align-items-center gap-2 mb-4">
-              <span class="fs-3">🌱</span>
-              <h2 class="h5 m-0 fw-bold tracking-wide text-uppercase">Fauna Aqui</h2>
+  <div class="min-vh-100 bg-light d-flex flex-column">
+    <NavBarPublic />
+
+    <div class="container-fluid flex-grow-1 d-flex align-items-start justify-content-center py-2 py-md-3">
+      <div class="row justify-content-center align-items-start w-100 m-0">
+        <div class="col-12 p-0 d-flex justify-content-center">
+
+          <div class="card border-0 shadow rounded-4 overflow-hidden mix-container">
+            <div class="row g-0 h-100 align-items-stretch painel-com-fina-divisao">
+
+              <PainelStatusDenuncia :passo-atual="passoAtual" />
+
+              <div class="col-12 col-md-8 bg-white p-3 p-sm-4 d-flex flex-column justify-content-start corpo-formulario">
+
+                <!-- Alerta de Erro -->
+                <div v-if="mensagemErro" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                  {{ mensagemErro }}
+                  <button type="button" class="btn-close" @click="mensagemErro = ''"></button>
+                </div>
+
+                <!-- Spinner de Carregamento -->
+                <div v-if="enviando" class="text-center py-5">
+                  <div class="spinner-border text-success" role="status">
+                    <span class="visually-hidden">Enviando...</span>
+                  </div>
+                  <p class="mt-3 text-muted">Enviando denuncia...</p>
+                </div>
+
+                <!-- Formulário -->
+                <div v-else class="w-100 container-passos mx-auto">
+                  <PassoContato v-if="passoAtual === 1" @proximo="avancarPasso1" />
+
+                  <PassoInicial v-else-if="passoAtual === 2" @proximo="avancarPasso2" />
+
+                  <PassoDetalhes 
+                    v-else-if="passoAtual === 3" 
+                    :categoria="formData.categoria"
+                    @proximo="avancarPasso3" 
+                  />
+
+                  <PassoLocalizacao 
+                    v-else-if="passoAtual === 4" 
+                    @proximo="avancarPasso4" 
+                  />
+
+                  <PassoFoto 
+                    v-else-if="passoAtual === 5" 
+                    @proximo="finalizarFormulario" 
+                  />
+                </div>
+
+              </div>
+
             </div>
-            <p class="small text-white-50">Sistema de Monitoramento e Registro de Ocorrências Animais no Campus.</p>
           </div>
 
-          <div class="my-4">
-            <div :class="['d-flex align-items-center gap-3 mb-4 transition-all', passoAtual === 1 ? 'opacity-100 fw-bold' : 'opacity-50']">
-              <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">1</div>
-              <div>Identificação <small class="d-block text-white-50 fw-normal">O que você observou?</small></div>
-            </div>
-            
-            <div :class="['d-flex align-items-center gap-3 mb-4 transition-all', passoAtual === 2 ? 'opacity-100 fw-bold' : 'opacity-50']">
-              <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">2</div>
-              <div>Detalhes <small class="d-block text-white-50 fw-normal">Tipo e situação</small></div>
-            </div>
-            
-            <div :class="['d-flex align-items-center gap-3 mb-4 transition-all', passoAtual === 3 ? 'opacity-100 fw-bold' : 'opacity-50']">
-              <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">3</div>
-              <div>Localização <small class="d-block text-white-50 fw-normal">Onde aconteceu?</small></div>
-            </div>
-
-            <div :class="['d-flex align-items-center gap-3 transition-all', passoAtual === 4 ? 'opacity-100 fw-bold' : 'opacity-50']">
-              <div class="rounded-circle bg-white text-success d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">4</div>
-              <div>Foto <small class="d-block text-white-50 fw-normal">Evidência visual</small></div>
-            </div>
-          </div>
-
-          <div class="small text-white-50">
-            © 2026 UFPA — Segurança e Meio Ambiente
-          </div>
         </div>
-
-        <div class="col-12 col-md-7 d-flex align-items-center justify-content-center p-3 p-sm-4 p-lg-5 bg-white" style="border-top-right-radius: 16px; border-bottom-right-radius: 16px;">
-          <div class="w-100 wrapper-conteudo-filho">
-            <PassoInicial 
-              v-if="passoAtual === 1" 
-              @proximo="avancarPasso1" 
-            />
-            
-            <PassoDetalhes 
-              v-else-if="passoAtual === 2" 
-              :categoria="formData.categoria"
-              @proximo="avancarPasso2" 
-            />
-            
-            <PassoLocalizacao 
-              v-else-if="passoAtual === 3" 
-              @proximo="avancarPasso3" 
-            />
-
-            <PassoFoto 
-              v-else-if="passoAtual === 4" 
-              @proximo="finalizarFormulario" 
-            />
-
-          </div>
-        </div>
-
       </div>
-    </div>
-
-    <div v-if="avisoEnvio" class="success-overlay d-flex align-items-center justify-content-center px-3">
-      <div class="success-card text-center p-4 p-md-5 shadow-lg bg-white">
-        <div class="success-badge mx-auto mb-3 d-flex align-items-center justify-content-center">
-          ✓
         </div>
-        <h3 class="h4 fw-bold text-success mb-2">Ocorrência enviada com sucesso</h3>
-        <p class="text-muted mb-0">Seu registro foi concluído. Você será redirecionado para a guia inicial em instantes.</p>
-      </div>
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, reactive } from 'vue'
 import PassoInicial from '../pages/PassoInicial.vue'
+import PassoContato from '../pages/PassoContato.vue'
 import PassoDetalhes from '../pages/PassoDetalhes.vue'
 import PassoLocalizacao from '../pages/PassoLocalização.vue'
 import PassoFoto from '../pages/PassoFoto.vue'
+import PainelStatusDenuncia from '../components/denuncia/PainelStatusDenuncia.vue'
+import NavBarPublic from '../components/NavBarPublic.vue'
+import { ocorrenciaService } from '../services/ocorrenciaService'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-const router = useRouter()
-
-// Estado do fluxo
 const passoAtual = ref(1)
-const avisoEnvio = ref(false)
-let timeoutRedirecionamento = null
+const enviando = ref(false)
+const mensagemErro = ref('')
 
-// Estado centralizado dos dados
 const formData = reactive({
-  categoria: '',      // Silvestre, Peçonhento, Ninho
-  tipoAnimal: '',     // Ave, Réptil, etc.
-  situacao: '',       // Ferido, Morto, etc.
+  categoria: '',
+  contatoNome: '',
+  contato: { tipo: '', valor: '' },
+  codigo: '',
+  tipoAnimal: '',
+  situacao: '',
   descricao: '',
-  localizacao: null,  // Coordenadas { lat, lng }
+  localizacao: null,
   referencia: '',
   foto: null
 })
 
-// Funções de navegação e salvamento
-const avancarPasso1 = (categoriaSelecionada) => {
-  formData.categoria = categoriaSelecionada
+const avancarPasso1 = (cont) => {
+  formData.contatoNome = cont.nome || ''
+  formData.contato = cont.contato || { tipo: '', valor: '' }
+  formData.codigo = cont.codigo || ''
   passoAtual.value = 2
 }
-
-const avancarPasso2 = (dadosDetalhes) => {
-  formData.tipoAnimal = dadosDetalhes.tipoAnimal
-  formData.situacao = dadosDetalhes.situacao
-  formData.descricao = dadosDetalhes.descricao
-  passoAtual.value = 3
+const avancarPasso2 = (cat) => { formData.categoria = cat; passoAtual.value = 3; }
+const avancarPasso3 = (det) => { 
+  formData.tipoAnimal = det.tipoAnimal; 
+  formData.situacao = det.situacao; 
+  formData.descricao = det.descricao; 
+  passoAtual.value = 4; 
+}
+const avancarPasso4 = (loc) => { 
+  formData.localizacao = loc.localizacao; 
+  formData.referencia = loc.referencia; 
+  passoAtual.value = 5; 
 }
 
-const avancarPasso3 = (dadosLocalizacao) => {
-  formData.localizacao = dadosLocalizacao.localizacao
-  formData.referencia = dadosLocalizacao.referencia
-  passoAtual.value = 4 // Avança para o passo da foto
-}
-
-const finalizarFormulario = (dadosLocalizacao) => {
-  formData.localizacao = dadosLocalizacao.localizacao
-  formData.referencia = dadosLocalizacao.referencia
-  formData.foto = dadosLocalizacao.foto
+const finalizarFormulario = async (dadosFoto) => {
+  formData.foto = dadosFoto.foto
   
-  console.log('Formulário Pronto para Envio ao Backend:', formData)
-  avisoEnvio.value = true
-
-  timeoutRedirecionamento = window.setTimeout(() => {
-    router.push('/')
-  }, 2200)
-}
-
-onBeforeUnmount(() => {
-  if (timeoutRedirecionamento) {
-    window.clearTimeout(timeoutRedirecionamento)
+  // Validação
+  if (!formData.foto) {
+    mensagemErro.value = 'Foto é obrigatória'
+    return
   }
-})
+
+  if (!formData.localizacao) {
+    mensagemErro.value = 'Localização é obrigatória'
+    return
+  }
+
+  try {
+    enviando.value = true
+    mensagemErro.value = ''
+
+    // Prepara os dados conforme o backend espera
+    const dadosParaEnviar = {
+      denunciante_nome: formData.contatoNome,
+      denunciante_contato_tipo: formData.contato.tipo,
+      denunciante_contato_valor: formData.contato.valor,
+      categoria_ocorrencia: formData.categoria,
+      tipo_animal: formData.tipoAnimal,
+      situacao_animal: formData.situacao,
+      descricao: formData.descricao,
+      latitude: formData.localizacao.lat,
+      longitude: formData.localizacao.lng,
+      ponto_referencia: formData.referencia || 'Não informado',
+      foto: formData.foto
+    }
+
+    // Envia para o backend
+    const resposta = await ocorrenciaService.criarDenuncia(dadosParaEnviar)
+    
+    // Sucesso
+    alert(`Ocorrência enviada com sucesso!\nCódigo de acesso: ${resposta.codigo}`)
+    
+    // Reseta o formulário
+    passoAtual.value = 1
+    formData.categoria = ''
+    formData.contatoNome = ''
+    formData.contato = { tipo: '', valor: '' }
+    formData.codigo = ''
+    formData.tipoAnimal = ''
+    formData.situacao = ''
+    formData.descricao = ''
+    formData.localizacao = null
+    formData.referencia = ''
+    formData.foto = null
+
+  } catch (error) {
+    console.error('Erro ao enviar denuncia:', error)
+    mensagemErro.value = error instanceof Error ? error.message : 'Erro ao enviar denuncia'
+  } finally {
+    enviando.value = false
+  }
+}
 </script>
 
 <style scoped>
-/* Transição suave para opacidade dos passos laterais */
-.transition-all {
-  transition: all 0.3s ease;
-}
+.rounded-4 { border-radius: 1.5rem !important; }
 
-.success-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 2000;
-  background: rgba(10, 28, 18, 0.45);
-  backdrop-filter: blur(8px);
-}
-
-.success-card {
-  width: min(92vw, 460px);
-  border-radius: 24px;
-  border: 1px solid rgba(25, 135, 84, 0.12);
-}
-
-.success-badge {
-  width: 72px;
-  height: 72px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #198754, #34c759);
-  color: #fff;
-  font-size: 2rem;
-  box-shadow: 0 18px 40px rgba(25, 135, 84, 0.25);
-}
-
-/* Regras específicas para Notebooks (telas a partir de 768px) */
+/* ==========================================================================
+   ESTRUTURA COMPACTA E ENRIJECIDA (PC)
+   ========================================================================== */
 @media (min-width: 768px) {
-  .container-fluid {
-    border-radius: 16px !important; /* Aplica borda arredondada no container inteiro */
+  .mix-container {
+    width: min(820px, calc(100vw - 36px)) !important;
+    max-width: min(820px, calc(100vw - 36px)) !important;
+    min-height: 500px !important;
+  }
+
+  .corpo-formulario {
+    height: 100% !important;
+    overflow: hidden !important;
+    padding: 0.85rem 1rem !important;
+  }
+
+  .container-passos {
+    max-width: 360px;
+  }
+
+  .painel-com-fina-divisao {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .corpo-formulario {
+    border-left: 1px solid rgba(15, 23, 42, 0.05);
   }
 }
 
-/* Ajuste crucial: Como os filhos tinham "max-width: 360px" fixo na tag style deles, 
-  forçamos para que dentro do painel de notebook eles usem 100% do espaço disponível 
-  (até um limite elegante de 450px) para não parecer um app de celular minúsculo na tela do PC.
-*/
-:deep(.card) {
-  max-width: 450px !important;
-  box-shadow: none !important; /* Remove a sombra do filho já que o pai já tem sombra */
-  padding: 0 !important; /* Deixa o padding por conta do grid pai */
+/* ==========================================================================
+   COMPORTAMENTO MOBILE (CELULAR)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  .mix-container {
+    max-width: calc(100vw - 24px);
+    margin: 0 auto;
+  }
+
+  .container-passos {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  :deep(.painel-status-desktop) {
+    padding: 1rem !important;
+  }
 }
 </style>
