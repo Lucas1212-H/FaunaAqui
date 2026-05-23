@@ -23,9 +23,14 @@
         />
 
         <HistoricoPainel 
-          v-else
+          v-else-if="abaAtiva === 'arquivadas'"
           :arquivadas="denunciasArquivadas"
           @selecionarHistorico="abrirHistorico"
+        />
+
+        <PublicadosPainel 
+          v-else-if="abaAtiva === 'publicados'"
+          :publicados="publicadosLista"
         />
       </div>
     </div>
@@ -36,11 +41,13 @@
       @aprovar="processarAprovacao"
       @alocar="handleAlocar"
       @arquivar="handleArquivar"
+      @publicar="handlePublicar"
     />
 
     <ModalHistoricoAnimal
       :item="historicoSelecionado"
       @fechar="historicoSelecionado = null"
+      @publicar="handlePublicarHistorico"
     />
   </div>
 </template>
@@ -55,6 +62,7 @@ import ModalHistoricoAnimal from '@/components/especialista/ModalHistoricoAnimal
 // Importação das novas subpáginas estruturadas
 import TriagemPainel from '@/pages/especialista/TriagemPainel.vue';
 import HistoricoPainel from '@/pages/especialista/HistoricoPainel.vue';
+import PublicadosPainel from '@/pages/especialista/PublicadosPainel.vue';
 
 const selectedDenuncia = ref(null);
 const historicoSelecionado = ref(null);
@@ -63,15 +71,17 @@ const carregando = ref(true);
 
 const denunciasTriagem = ref([]);
 const denunciasArquivadas = ref([]);
+const publicadosLista = ref([]);
 
 const API_BASE = 'http://localhost:8000/api/ocorrencias';
 
 const buscarDadosDoBanco = async () => {
   try {
     carregando.value = true;
-    const [resPendentes, resArquivados] = await Promise.all([
+    const [resPendentes, resArquivados, resPublicados] = await Promise.all([
       axios.get(`${API_BASE}/pendentes`),
-      axios.get(`${API_BASE}/arquivadas`).catch(() => ({ data: [] }))
+      axios.get(`${API_BASE}/arquivadas`).catch(() => ({ data: [] })),
+      axios.get(`${API_BASE}/publicados`).catch(() => ({ data: [] }))
     ]);
 
     denunciasTriagem.value = resPendentes.data.map(item => ({
@@ -86,7 +96,7 @@ const buscarDadosDoBanco = async () => {
       data: new Date(item.created_at).toLocaleDateString('pt-BR'),
       status: item.situacao_animal,
       assigned: item.parecer_tecnico ? 'Especialista' : null,
-      coordenadas: { lat: item.latitude, lng: item.longitude }
+      coordenadas: { lat: item.latitude !== null ? parseFloat(item.latitude) : null, lng: item.longitude !== null ? parseFloat(item.longitude) : null }
     }));
 
     denunciasArquivadas.value = resArquivados.data.map(item => ({
@@ -101,6 +111,14 @@ const buscarDadosDoBanco = async () => {
         { titulo: 'Denúncia recebida', data: new Date(item.created_at).toLocaleDateString('pt-BR'), descricao: item.descricao },
         { titulo: 'Finalizado', data: new Date(item.updated_at).toLocaleDateString('pt-BR'), descricao: item.parecer_tecnico || 'Sem parecer.' }
       ]
+    }));
+
+    publicadosLista.value = resPublicados.data.map(item => ({
+      id: item.id,
+      animal: item.tipo_animal,
+      local: item.ponto_referencia,
+      data: new Date(item.created_at).toLocaleDateString('pt-BR'),
+      coordenadas: { lat: item.latitude !== null ? parseFloat(item.latitude) : null, lng: item.longitude !== null ? parseFloat(item.longitude) : null }
     }));
   } catch (error) {
     console.error("Erro na sincronização:", error);
@@ -123,8 +141,14 @@ const mudarAba = (aba) => {
   historicoSelecionado.value = null;
 };
 
-const handleValidar = (d) => { selectedDenuncia.value = d; };
-const abrirHistorico = (item) => { historicoSelecionado.value = item; };
+const handleValidar = (d) => {
+  historicoSelecionado.value = null;
+  selectedDenuncia.value = d;
+};
+const abrirHistorico = (item) => {
+  selectedDenuncia.value = null;
+  historicoSelecionado.value = item;
+};
 
 const processarAprovacao = async (dadosAprovacao) => {
   const denunciaAtual = selectedDenuncia.value;
@@ -159,6 +183,35 @@ const handleArquivar = async ({ denunciaId }) => {
     buscarDadosDoBanco();
   } catch (error) {
     alert("Erro ao arquivar.");
+  }
+};
+
+const handlePublicar = async ({ denunciaId }) => {
+  try {
+    await axios.put(`${API_BASE}/${denunciaId}/publicar`, {
+      status: 'Publicado'
+    });
+    selectedDenuncia.value = null;
+    alert('Ocorrência publicada no mapa! 📍');
+    buscarDadosDoBanco();
+  } catch (error) {
+    alert("Erro ao publicar.");
+    console.error(error);
+  }
+};
+
+const handlePublicarHistorico = async (item) => {
+  try {
+    await axios.put(`${API_BASE}/${item.id}/publicar`, {
+      status: 'Publicado'
+    });
+    historicoSelecionado.value = null;
+    abaAtiva.value = 'publicados';
+    alert('Ocorrência publicada no mapa! 📍');
+    await buscarDadosDoBanco();
+  } catch (error) {
+    alert('Erro ao publicar.');
+    console.error(error);
   }
 };
 

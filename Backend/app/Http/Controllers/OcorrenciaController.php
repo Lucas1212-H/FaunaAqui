@@ -150,4 +150,42 @@ class OcorrenciaController extends Controller
             'longitude' => $ocorrencia->longitude,
         ];
     }
+    public function indexPublicados()
+    {
+        try {
+            $publicados = Ocorrencia::where('status', 'Publicado')
+                ->orderBy('created_at', 'desc')
+                ->get()
+                ->map(fn($item) => $this->mapearOcorrencia($item));
+            
+            return response()->json($publicados, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro ao buscar publicados: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+    public function publicar($id)
+    {
+        try {
+            $ocorrencia = Ocorrencia::where('codigo_ocorrencia', $id)->first();
+            
+            if (!$ocorrencia) {
+                return response()->json([
+                    'error' => 'Ocorrência não encontrada'
+                ], 404);
+            }
+
+            $ocorrencia->update(['status' => 'Publicado']);
+
+            return response()->json([
+                'message' => 'Ocorrência publicada com sucesso!',
+                'data' => $this->mapearOcorrencia($ocorrencia)
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Erro ao publicar: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

@@ -77,7 +77,6 @@ watch(() => props.denuncia, (novo) => {
 })
 
 const confirmar = () => {
-  if (!alocadoPorMe.value) return
   emit('aprovar', { denunciaId: props.denuncia.id, parecer: parecer.value })
 }
 
