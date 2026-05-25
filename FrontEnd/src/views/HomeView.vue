@@ -66,7 +66,7 @@ const animais = [
 <style scoped>
 .hero-section {
   min-height: 80vh;
-  background: url('@/assets/images/map.png') center/cover no-repeat;
+  background: url('@/assets/images/faunaaqui.png') center/cover no-repeat;
   position: relative;
 }
 .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
