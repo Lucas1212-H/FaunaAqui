@@ -27,7 +27,7 @@ export const ocorrenciaService = {
   /**
    * Cria uma nova ocorrência (denuncia) no backend
    * @param dados Dados do formulário da denuncia
-   * @returns Response com confirmação e código de acesso
+    * @returns Response com confirmação da ocorrência
    */
   async criarDenuncia(dados: DadosDenuncia) {
     const formData = new FormData()
@@ -63,13 +63,13 @@ export const ocorrenciaService = {
   },
 
   /**
-   * Busca os dados de uma ocorrência pelo código de acesso
-   * @param codigoAcesso Código único da ocorrência
+   * Busca os dados de uma ocorrência pelo id
+   * @param id Identificador da ocorrência
    * @returns Dados da ocorrência
    */
-  async obterDenunciaPorCodigo(codigoAcesso: string) {
+  async obterDenunciaPorId(id: number | string) {
     try {
-      const response = await api.get(`/ocorrencias/${codigoAcesso}`)
+      const response = await api.get(`/ocorrencias/${id}`)
       return response.data
     } catch (error) {
       if (axios.isAxiosError(error)) {

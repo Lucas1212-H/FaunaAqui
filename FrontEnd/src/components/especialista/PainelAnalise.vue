@@ -18,14 +18,18 @@
       </div>
     </div>
 
-    <button class="btn btn-purple w-100 py-3 fw-bold text-white mt-auto" @click="$emit('gerenciarEspecies')">
+    <RouterLink class="btn btn-purple w-100 py-3 fw-bold text-white mt-auto" to="/catalogo">
       Base de Dados Taxonômica
-    </button>
+    </RouterLink>
   </div>
 </template>
 
 <script setup>
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 defineEmits(['gerenciarEspecies'])
+
 </script>
 
 <style scoped>

@@ -82,7 +82,6 @@ const formData = reactive({
   categoria: '',
   contatoNome: '',
   contato: { tipo: '', valor: '' },
-  codigo: '',
   tipoAnimal: '',
   situacao: '',
   descricao: '',
@@ -94,7 +93,6 @@ const formData = reactive({
 const avancarPasso1 = (cont) => {
   formData.contatoNome = cont.nome || ''
   formData.contato = cont.contato || { tipo: '', valor: '' }
-  formData.codigo = cont.codigo || ''
   passoAtual.value = 2
 }
 const avancarPasso2 = (cat) => { formData.categoria = cat; passoAtual.value = 3; }
@@ -147,14 +145,13 @@ const finalizarFormulario = async (dadosFoto) => {
     const resposta = await ocorrenciaService.criarDenuncia(dadosParaEnviar)
     
     // Sucesso
-    alert(`Ocorrência enviada com sucesso!\nCódigo de acesso: ${resposta.codigo}`)
+    alert('Ocorrência enviada com sucesso!')
     
     // Reseta o formulário
     passoAtual.value = 1
     formData.categoria = ''
     formData.contatoNome = ''
     formData.contato = { tipo: '', valor: '' }
-    formData.codigo = ''
     formData.tipoAnimal = ''
     formData.situacao = ''
     formData.descricao = ''

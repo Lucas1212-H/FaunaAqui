@@ -8,7 +8,7 @@
       <div class="nav-pill-bg d-flex align-items-center justify-content-around">
         <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'triagem' }" @click.prevent="$emit('mudarAba', 'triagem')">Início</a>
         <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'arquivadas' }" @click.prevent="$emit('mudarAba', 'arquivadas')">Denuncias Arquivadas</a>
-        <a href="#" class="nav-item-link">Publicados</a>
+        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'publicados' }" @click.prevent="$emit('mudarAba', 'publicados')">Publicados</a>
         <a href="#" class="nav-item-link">Sobre nós</a>
       </div>
     </div>

@@ -18,11 +18,6 @@
       <input v-model="contatoValor" :placeholder="contatoTipo === 'email' ? 'seu@email.com' : '(99) 99999-9999'" class="form-control shadow-none rounded-3" />
     </div>
 
-    <div class="mb-2">
-      <label class="form-label small text-uppercase text-muted fw-bold">Código</label>
-      <input v-model="codigo" class="form-control shadow-none rounded-3" placeholder="Código (opcional)" />
-    </div>
-
     <button 
       class="btn btn-light w-100 py-3 fw-bold border d-flex justify-content-center align-items-center gap-2 mt-2" 
       style="border-radius: 12px; font-size: 14px;"
@@ -42,14 +37,12 @@ const emit = defineEmits(['proximo'])
 const nome = ref('')
 const contatoTipo = ref('telefone')
 const contatoValor = ref('')
-const codigo = ref('')
 
 const enviar = () => {
   if (!nome.value || !contatoValor.value) return
   emit('proximo', {
     nome: nome.value,
-    contato: { tipo: contatoTipo.value, valor: contatoValor.value },
-    codigo: codigo.value
+    contato: { tipo: contatoTipo.value, valor: contatoValor.value }
   })
 }
 </script>
