@@ -20,7 +20,7 @@ class Ocorrencia extends Model
         'denunciante_contato_valor',
         'categoria_ocorrencia',
         'tipo_animal',
-        'local_ocorrencia',
+        'situacao_animal',
         'descricao_ocorrencia',
         'latitude',
         'longitude',

@@ -140,7 +140,7 @@ const carregarDados = async () => {
     ocorrencias.value = listaResponse.data.map((item) => ({
       id: item.id,
       tipoAnimal: normalizar(item.tipo_animal),
-      localOcorrencia: item.local_ocorrencia || item.situacao_animal || 'Não informado',
+      localOcorrencia: item.situacao_animal || 'Não informado',
     }))
 
     const data = detalheResponse.data?.data ?? detalheResponse.data
@@ -154,7 +154,7 @@ const carregarDados = async () => {
       tipoAnimal: normalizar(data.tipo_animal),
       categoria: data.categoria_ocorrencia || 'Categoria não informada',
       status: data.status || 'Publicado',
-      localOcorrencia: data.local_ocorrencia || data.situacao_animal || 'Não informado',
+      localOcorrencia: data.situacao_animal || 'Não informado',
       pontoReferencia: data.ponto_referencia || 'Não informado',
       latitude: data.latitude || '-',
       longitude: data.longitude || '-',

@@ -1,213 +1,342 @@
 <template>
-    <div class="catalogo-page min-vh-100 bg-light">
-        <NavBar />
+  <div>
+    <NavBar />
 
-        <header class="container py-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <p class="text-uppercase text-muted small fw-semibold mb-1">Catálogo de espécies</p>
-                <h1 class="h3 fw-bold mb-0">
-                    {{ tipoSelecionado ? `${tipoSelecionado}` : 'Todas as espécies publicadas' }}
-                </h1>
-            </div>
-
-            <div class="d-flex flex-wrap gap-2">
-                <button class="btn btn-outline-secondary" type="button" @click="limparFiltro" :disabled="!tipoSelecionado">
-                    Voltar
-                </button>
-                <button class="btn btn-primary" type="button">
-                    Adicionar Espécie
-                </button>
-            </div>
+    <main class="container py-5">
+      
+      <section v-if="!categoriaSelecionada">
+        <header class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h3 fw-bold text-dark m-0">Catálogo de Categorias</h1>
+          <button class="btn btn-success fw-medium px-4" @click="modalNovaCategoria = true">
+            + Nova Categoria
+          </button>
         </header>
 
-        <main class="container pb-5">
-                <section v-if="!tipoSelecionado" class="row g-3">
-                    <div v-for="tipo in tiposDisponiveis" :key="tipo.nome" class="col-12 col-sm-6 col-lg-4 col-xxl-3">
-                        <article
-                            class="card h-100 shadow-sm border-0 especie-card"
-                            role="button"
-                            tabindex="0"
-                            @click="selecionarTipo(tipo.nome)"
-                            @keydown.enter.prevent="selecionarTipo(tipo.nome)"
-                            @keydown.space.prevent="selecionarTipo(tipo.nome)"
-                        >
-                            <div class="card-body p-4 text-center">
-                                <div class="rounded-circle bg-success-subtle text-success d-inline-flex align-items-center justify-content-center especie-icon mb-3">
-                                    <span class="fw-bold">{{ tipo.nome.charAt(0) }}</span>
-                                </div>
-                                <h2 class="h5 fw-bold mb-1">{{ tipo.nome }}</h2>
-                                <p class="text-muted mb-0">{{ tipo.quantidade }} ocorrência(s) publicada(s)</p>
-                            </div>
-                        </article>
-                    </div>
+        <div class="row row-cols-2 row-cols-md-4 g-4 justify-content-center">
+          <div class="col" v-for="cat in listaCategorias" :key="cat.id_categoria">
+            <article 
+              class="card p-4 text-center shadow-sm h-100 border-0 rounded-3"
+              style="cursor: pointer;"
+              @click="selecionarCategoria(cat)"
+            >
+              <figure class="m-0">
+                <img 
+                  :src="cat.foto ? `http://localhost:8000/storage/${cat.foto}` : 'https://cdn-icons-png.flaticon.com/512/616/616408.png'" 
+                  :alt="cat.nome_popular"
+                  class="img-fluid mb-2" 
+                  style="max-height: 80px;"
+                >
+                <figcaption class="h5 fw-bold text-dark m-0">{{ cat.nome_popular }}</figcaption>
+                <small class="text-muted fst-italic">{{ cat.nome_cientifico }}</small>
+              </figure>
+            </article>
+          </div>
+        </div>
+      </section>
 
-                    <div v-if="tiposDisponiveis.length === 0" class="col-12">
-                        <div class="alert alert-info text-center mb-0">
-                            Nenhuma ocorrência publicada disponível para catálogo.
-                        </div>
-                    </div>
-                </section>
+      <section v-else>
+        <header class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <button class="btn btn-sm btn-light border px-3 mb-2" @click="categoriaSelecionada = null">
+              ← Voltar
+            </button>
+            <h1 class="h3 fw-bold text-success m-0">Espécies em {{ categoriaSelecionada.nome_popular }}</h1>
+          </div>
+          
+          <button class="btn btn-primary fw-medium px-4" @click="modalNovaEspecie = true">
+            + Nova Espécie
+          </button>
+        </header>
 
-                <section v-else>
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <p class="text-muted mb-0">
-                            Mostrando {{ animaisFiltrados.length }} ocorrência(s) para {{ tipoSelecionado }}
-                        </p>
-                    </div>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          <div class="col" v-for="especie in (categoriaSelecionada?.especies || [])" :key="especie.id_especie">
+            <article class="card h-100 shadow-sm border-0 overflow-hidden rounded-3">
+              <img 
+                :src="especie.foto ? `http://localhost:8000/storage/${especie.foto}` : 'https://picsum.photos/seed/fauna/300/200'" 
+                :alt="especie.nome_popular" 
+                class="card-img-top object-fit-cover"
+                style="height: 180px;"
+              >
+              <div class="card-body p-3">
+                <h2 class="h5 fw-bold text-dark mb-1">{{ especie.nome_popular }}</h2>
+                <small class="text-muted fst-italic d-block mb-2">{{ especie.nome_cientifico }}</small>
+                <p class="text-secondary small m-0">{{ especie.descricao }}</p>
+              </div>
+            </article>
+          </div>
+        </div>
 
-                    <div class="row g-3">
-                        <div v-for="animal in animaisFiltrados" :key="animal.id" class="col-12 col-md-6 col-xl-4">
-                            <article class="card h-100 shadow-sm border-0" role="button" tabindex="0"
-                                @click="abrirDetalhe(animal.id)"
-                                @keydown.enter.prevent="abrirDetalhe(animal.id)"
-                            >
-                                <img
-                                    class="card-img-top catalogo-image"
-                                    :src="animal.imagem"
-                                    :alt="animal.tipoAnimal"
-                                >
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between gap-2 mb-2">
-                                        <span class="badge text-bg-success">{{ animal.tipoAnimal }}</span>
-                                        <span class="badge text-bg-light text-dark">{{ animal.status }}</span>
-                                    </div>
-                                    <h2 class="h5 fw-bold mb-1">{{ animal.titulo }}</h2>
-                                    <small class="text-muted d-block mb-2">{{ animal.nomeCientifico }}</small>
-                                    <p class="mb-0 text-secondary">{{ animal.descricao }}</p>
-                                </div>
-                            </article>
-                        </div>
+        <div v-if="(categoriaSelecionada?.especies || []).length === 0" class="alert alert-light text-center border mt-4">
+          Nenhuma espécie cadastrada em {{ categoriaSelecionada?.nome_popular }} ainda.
+        </div>
+      </section>
 
-                        <div v-if="animaisFiltrados.length === 0" class="col-12">
-                            <div class="alert alert-info text-center mb-0">
-                                Nenhuma ocorrência cadastrada para {{ tipoSelecionado }} ainda.
-                            </div>
-                        </div>
-                    </div>
-                </section>
-        </main>
+    </main>
+
+    <!-- Modal Nova Categoria -->
+    <div class="modal" :class="{ show: modalNovaCategoria }" :style="{ display: modalNovaCategoria ? 'block' : 'none' }" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Nova Categoria</h5>
+            <button type="button" class="btn-close" @click="modalNovaCategoria = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nome Científico</label>
+              <input type="text" class="form-control" v-model="formCategoria.nome_cientifico" placeholder="Ex: Felidae">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nome Popular</label>
+              <input type="text" class="form-control" v-model="formCategoria.nome_popular" placeholder="Ex: Felinos">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Foto</label>
+              <input type="file" class="form-control" @change="handleFotoCategoriaChange" accept="image/*">
+              <small class="text-muted">Formatos aceitos: JPG, PNG, GIF, WebP</small>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="modalNovaCategoria = false">Cancelar</button>
+            <button type="button" class="btn btn-success" @click="criarCategoria">Salvar</button>
+          </div>
+        </div>
+      </div>
     </div>
+
+    <!-- Modal Nova Espécie -->
+    <div class="modal" :class="{ show: modalNovaEspecie }" :style="{ display: modalNovaEspecie ? 'block' : 'none' }" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Nova Espécie</h5>
+            <button type="button" class="btn-close" @click="modalNovaEspecie = false"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-3">
+              <label class="form-label">Nome Científico</label>
+              <input type="text" class="form-control" v-model="formEspecie.nome_cientifico" placeholder="Ex: Panthera leo">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Nome Popular</label>
+              <input type="text" class="form-control" v-model="formEspecie.nome_popular" placeholder="Ex: Leão">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Foto</label>
+              <input type="file" class="form-control" @change="handleFotoEspecieChange" accept="image/*">
+              <small class="text-muted">Formatos aceitos: JPG, PNG, GIF, WebP</small>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Descrição</label>
+              <textarea class="form-control" v-model="formEspecie.descricao" rows="3" placeholder="Ex: Descrição da espécie..."></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" @click="modalNovaEspecie = false">Cancelar</button>
+            <button type="button" class="btn btn-primary" @click="criarEspecie">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Backdrop -->
+    <div class="modal-backdrop fade" :class="{ show: modalNovaCategoria || modalNovaEspecie }" v-if="modalNovaCategoria || modalNovaEspecie"></div>
+  </div>
 </template>
 
-<script setup>
-import { computed, onMounted, ref } from 'vue'
-import axios from 'axios'
-import { useRouter } from 'vue-router'
-import NavBar from '@/components/NavBar.vue'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
+<script>
+import NavBar from '@/components/NavBar.vue';
+import axios from 'axios';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
-const carregando = ref(true)
-const tipoSelecionado = ref('')
-const ocorrencias = ref([])
-
-const API_BASE = 'http://localhost:8000/api/ocorrencias'
-
-const normalizarTipo = (valor) => {
-    return (valor ?? '').toString().trim()
-}
-
-const tipoParaTitulo = (valor) => {
-    const tipo = normalizarTipo(valor)
-    return tipo ? `${tipo.charAt(0).toUpperCase()}${tipo.slice(1)}` : 'Sem tipo'
-}
-
-const tiposDisponiveis = computed(() => {
-    const acumulado = new Map()
-
-    ocorrencias.value.forEach((item) => {
-        const tipo = normalizarTipo(item.tipoAnimal)
-
-        if (!tipo) {
-            return
+export default {
+  components: {
+    NavBar
+  },
+  data() {
+    return {
+      // Estado que dita qual tela está ativa (null = Categorias, objeto preenchido = Espécies)
+      categoriaSelecionada: null,
+      
+      // Recebe o JSON completo estruturado com suas espécies
+      listaCategorias: [],
+      
+      // Modais
+      modalNovaCategoria: false,
+      modalNovaEspecie: false,
+      
+      // Formulários
+      formCategoria: {
+        nome_cientifico: '',
+        nome_popular: '',
+        foto: null
+      },
+      formEspecie: {
+        nome_cientifico: '',
+        nome_popular: '',
+        foto: null,
+        descricao: ''
+      }
+    }
+  },
+  methods: {
+    async buscarDadosDoCatalogo() {
+      try {
+        const response = await axios.get('http://localhost:8000/api/categorias');
+        this.listaCategorias = response.data;
+      } catch (error) {
+        console.error('Erro ao conectar com a API:', error);
+      }
+    },
+    
+    async selecionarCategoria(categoria) {
+      try {
+        // Busca a categoria com suas espécies
+        const response = await axios.get(`http://localhost:8000/api/categorias/${categoria.id_categoria || categoria.id}`);
+        let dados = response.data;
+        
+        // Se a resposta for um array, pega o primeiro elemento
+        if (Array.isArray(dados)) {
+          dados = dados[0] || {};
         }
-
-        const atual = acumulado.get(tipo) ?? { nome: tipoParaTitulo(tipo), quantidade: 0 }
-        acumulado.set(tipo, {
-            nome: atual.nome,
-            quantidade: atual.quantidade + 1,
-        })
-    })
-
-    return Array.from(acumulado.values()).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'))
-})
-
-const animaisFiltrados = computed(() => {
-    if (!tipoSelecionado.value) {
-        return []
+        
+        // Garante que sempre há um array de espécies, mesmo que vazio
+        if (!dados.especies) {
+          dados.especies = [];
+        }
+        
+        this.categoriaSelecionada = dados;
+      } catch (error) {
+        console.error('Erro ao carregar espécies:', error);
+        // Mesmo com erro, entra na categoria com espécies vazias
+        this.categoriaSelecionada = {
+          ...categoria,
+          especies: []
+        };
+      }
+    },
+    
+    handleFotoCategoriaChange(event) {
+      this.formCategoria.foto = event.target.files[0] || null;
+    },
+    
+    handleFotoEspecieChange(event) {
+      this.formEspecie.foto = event.target.files[0] || null;
+    },
+    
+    async criarCategoria() {
+      try {
+        if (!this.formCategoria.nome_cientifico || !this.formCategoria.nome_popular) {
+          alert('Preencha todos os campos obrigatórios!');
+          return;
+        }
+        
+        const formData = new FormData();
+        formData.append('nome_cientifico', this.formCategoria.nome_cientifico);
+        formData.append('nome_popular', this.formCategoria.nome_popular);
+        if (this.formCategoria.foto) {
+          formData.append('foto', this.formCategoria.foto);
+        }
+        
+        await axios.post('http://localhost:8000/api/categorias', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        // Limpar formulário e fechar modal
+        this.formCategoria = { nome_cientifico: '', nome_popular: '', foto: null };
+        this.modalNovaCategoria = false;
+        
+        // Recarregar dados
+        await this.buscarDadosDoCatalogo();
+        alert('Categoria criada com sucesso!');
+      } catch (error) {
+        console.error('Erro ao criar categoria:', error);
+        alert('Erro ao criar categoria. Verifique o console para mais detalhes.');
+      }
+    },
+    
+    async criarEspecie() {
+      try {
+        if (!this.categoriaSelecionada) {
+          alert('Selecione uma categoria primeiro!');
+          return;
+        }
+        
+        if (!this.formEspecie.nome_cientifico || !this.formEspecie.nome_popular) {
+          alert('Preencha todos os campos obrigatórios!');
+          return;
+        }
+        
+        const formData = new FormData();
+        formData.append('id_categoria', this.categoriaSelecionada.id_categoria);
+        formData.append('nome_cientifico', this.formEspecie.nome_cientifico);
+        formData.append('nome_popular', this.formEspecie.nome_popular);
+        formData.append('descricao', this.formEspecie.descricao);
+        if (this.formEspecie.foto) {
+          formData.append('foto', this.formEspecie.foto);
+        }
+        
+        await axios.post('http://localhost:8000/api/especies', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        // Limpar formulário e fechar modal
+        this.formEspecie = { nome_cientifico: '', nome_popular: '', foto: null, descricao: '' };
+        this.modalNovaEspecie = false;
+        
+        // Recarregar categoria com suas espécies
+        const response = await axios.get(`http://localhost:8000/api/categorias/${this.categoriaSelecionada.id_categoria}`);
+        const dados = response.data;
+        if (!dados.especies) {
+          dados.especies = [];
+        }
+        this.categoriaSelecionada = dados;
+        
+        alert('Espécie criada com sucesso!');
+      } catch (error) {
+        console.error('Erro ao criar espécie:', error);
+        alert('Erro ao criar espécie. Verifique o console para mais detalhes.');
+      }
     }
-
-    return ocorrencias.value.filter((animal) => animal.tipoAnimal === tipoSelecionado.value)
-})
-
-const carregarOcorrencias = async () => {
-    try {
-        carregando.value = true
-        const response = await axios.get(`${API_BASE}/publicados`)
-
-        ocorrencias.value = response.data.map((item) => ({
-            id: item.id,
-            tipoAnimal: normalizarTipo(item.tipo_animal),
-            titulo: tipoParaTitulo(item.tipo_animal),
-            nomeCientifico: item.categoria_ocorrencia || 'Categoria não informada',
-            descricao: item.descricao_ocorrencia || item.descricao || 'Sem descrição',
-            status: item.status || 'Publicado',
-            imagem: item.foto_path
-                ? `http://localhost:8000/storage/${item.foto_path}`
-                : 'https://cdn-icons-png.flaticon.com/512/616/616408.png',
-        }))
-    } catch (error) {
-        console.error('Erro ao carregar catálogo:', error)
-        ocorrencias.value = []
-    } finally {
-        carregando.value = false
-    }
+  },
+  mounted() {
+    this.buscarDadosDoCatalogo();
+  }
 }
-
-const selecionarTipo = (tipo) => {
-    tipoSelecionado.value = tipo
-}
-
-const limparFiltro = () => {
-    tipoSelecionado.value = ''
-}
-
-const router = useRouter()
-
-const abrirDetalhe = (id) => {
-    if (!id) return
-    router.push({ name: 'catalogo-detalhe', params: { id } })
-}
-
-onMounted(() => {
-    carregarOcorrencias()
-})
 </script>
 
 <style scoped>
-.catalogo-page {
-    background:
-        radial-gradient(circle at top left, rgba(25, 135, 84, 0.12), transparent 34%),
-        linear-gradient(180deg, #f8faf8 0%, #eef3ef 100%);
+/* Estilos mínimos mantidos apenas para caprichar na apresentação dos cards */
+.card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.08) !important;
 }
 
-.especie-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* Modal styles */
+.modal.show {
+  display: block !important;
+  background-color: rgba(0, 0, 0, 0.5);
 }
 
-.especie-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 1rem 2rem rgba(16, 24, 40, 0.08) !important;
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
 }
 
-.especie-icon {
-    width: 64px;
-    height: 64px;
-    font-size: 1.2rem;
-}
-
-.catalogo-image {
-    height: 220px;
-    object-fit: cover;
+.modal-backdrop.show {
+  opacity: 0.5;
 }
 </style>

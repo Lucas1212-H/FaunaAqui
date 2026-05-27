@@ -20,7 +20,7 @@ return new class extends Migration
             // dados do animal
             $table->string('categoria_ocorrencia');
             $table->string('tipo_animal');
-            $table->string('local_ocorrencia');
+            $table->string('situacao_animal');
             $table->string('descricao_ocorrencia');
             //  Localização e Mídia 
             $table->decimal('latitude', 10, 8);
