@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import RegistroView from '../views/RegistroView.vue'
@@ -6,6 +6,7 @@ import EspecialistaView from '../views/EspecialistaView.vue'
 import DenunciaView from '../views/DenunciaView.vue'
 import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
 import AnimalInfo from '../components/AnimalInfo.vue'
+import ContatoPage from '../pages/ContatoPage.vue'
 import { useAuth } from '../composables/useAuth'
 const routes = [
   {
@@ -57,28 +58,26 @@ const router = createRouter({
 })
 
 // Guards de rota para autenticação
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const { isAutenticado } = useAuth()
 
   // Se a rota requer autenticação
   if (to.meta.requiresAuth) {
     if (isAutenticado.value) {
-      next()
+      return true
     } else {
       // Redirecionar para login se não estiver autenticado
-      next({ name: 'login', query: { redirect: to.fullPath } })
+      return { name: 'login', query: { redirect: to.fullPath } }
     }
   }
   // Se a rota requer estar desautenticado (como login/cadastro)
   else if (to.meta.requiresGuest) {
     if (!isAutenticado.value) {
-      next()
+      return true
     } else {
       // Se já está autenticado e tenta acessar login/cadastro, redireciona para dashboard
-      next({ name: 'specialist-area' })
+      return { name: 'specialist-area' }
     }
-  } else {
-    next()
   }
 })
 
