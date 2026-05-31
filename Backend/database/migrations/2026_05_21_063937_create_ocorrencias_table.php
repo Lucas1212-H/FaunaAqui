@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('denunciante_contato_valor');
             $table->string('codigo_ocorrencia')->primary();
             // dados do animal
-            $table->string('categoria_ocorrencia');
+            $table->string('distincao_biologica');
             $table->string('tipo_animal');
-            $table->string('local_ocorrencia');
+            $table->string('situacao_animal');
             $table->string('descricao_ocorrencia');
             //  Localização e Mídia 
             $table->decimal('latitude', 10, 8);

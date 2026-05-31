@@ -10,10 +10,13 @@
           <div class="auth-card shadow-lg p-5">
             <h2 class="auth-title mb-4">Cadastro</h2>
             
-            <div v-if="erro" class="alert alert-danger alert-dismissible fade show" role="alert">
-              {{ erro }}
-              <button type="button" class="btn-close" @click="erro = ''"></button>
-            </div>
+            <UiMessage
+              v-if="erro"
+              type="error"
+              title="Cadastro não concluído"
+              :message="erro"
+              @dismiss="erro = ''"
+            />
             
             <form @submit.prevent="handleRegister">
               <div class="mb-3">
@@ -77,6 +80,7 @@
 import { ref } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import UiMessage from '@/components/UiMessage.vue'
 
 const router = useRouter()
 const { register, carregando } = useAuth()

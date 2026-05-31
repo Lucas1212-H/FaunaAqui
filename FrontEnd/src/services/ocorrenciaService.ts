@@ -13,7 +13,7 @@ export interface DadosDenuncia {
   denunciante_nome: string
   denunciante_contato_tipo: string
   denunciante_contato_valor: string
-  categoria_ocorrencia: string
+  distincao_biologica: string
   tipo_animal: string
   situacao_animal: string
   descricao: string
@@ -36,7 +36,7 @@ export const ocorrenciaService = {
     formData.append('denunciante_nome', dados.denunciante_nome)
     formData.append('denunciante_contato_tipo', dados.denunciante_contato_tipo)
     formData.append('denunciante_contato_valor', dados.denunciante_contato_valor)
-    formData.append('categoria_ocorrencia', dados.categoria_ocorrencia)
+    formData.append('distincao_biologica', dados.distincao_biologica)
     formData.append('tipo_animal', dados.tipo_animal)
     formData.append('situacao_animal', dados.situacao_animal)
     formData.append('descricao', dados.descricao)

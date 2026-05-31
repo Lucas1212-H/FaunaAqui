@@ -28,21 +28,22 @@
       <div class="text-uppercase text-muted fw-bold mb-2" style="font-size: 0.7rem; letter-spacing: 0.8px;">
         Referência (Opcional)
       </div>
-      <select 
-        v-model="referencia" 
-        class="form-select shadow-none border-light-subtle rounded-3 text-dark text-opacity-75"
+      <input
+        v-model.trim="referencia"
+        type="text"
+        class="form-control shadow-none border-light-subtle rounded-3 text-dark text-opacity-75"
         style="padding: 12px; font-size: 14px;"
-      >
-        <option value="" disabled selected>Selecione um ponto de referência...</option>
-        <option value="reitoria">Reitoria</option>
-        <option value="vadiacao">Betina</option>
-        <option value="rua-perimetral">Rua Perimetral</option>
-        <option value="bloco-computacao">Bloco de Computação (Mirante)</option>
-      </select>
+        placeholder="Ex.: em frente à Reitoria, perto do bloco de Computação"
+        maxlength="120"
+        autocomplete="off"
+      />
+      <div class="form-text small text-muted mt-1">
+        Escreva uma descrição curta do local, se quiser ajudar no retorno.
+      </div>
     </div>
 
     <button 
-      class="btn btn-success w-100 py-3 fw-bold border-0 d-flex justify-content-center align-items-center gap-2 t-2 shadow-sm text-white"
+      class="btn btn-success w-100 py-3 fw-bold border-0 d-flex justify-content-center align-items-center gap-2 shadow-sm text-white"
       style="border-radius: 12px; font-size: 14px;"
       @click="avancar"
       :disabled="!coordenadas"
@@ -120,7 +121,7 @@ const avancar = () => {
 </script>
 
 <style scoped>
-.form-select:focus {
+.form-control:focus {
   border-color: #198754;
   box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
 }

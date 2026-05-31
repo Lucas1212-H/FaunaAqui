@@ -7,6 +7,9 @@ import DenunciaView from '../views/DenunciaView.vue'
 import ContatosView from '../views/ContatosView.vue'
 import QuemSomos from '../views/QuemSomos.vue'
 import BlogView from '../views/BlogView.vue'
+import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
+import AnimalInfo from '../components/AnimalInfo.vue'
+import ContatoPage from '../pages/ContatoPage.vue'
 import { useAuth } from '../composables/useAuth'
 import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
 
@@ -58,13 +61,23 @@ const routes = [
     name: 'blog',
     component: BlogView,
     meta: { title: 'Blog' }
+    component: DenunciaView
   },
   {
     path: '/catalogo',
     name: 'catalogo',
     component: CatalogoAnimal,
     meta: { title: 'Catálogo Animal' }
+    component: CatalogoAnimal
   }
+  ,
+  {
+    path: '/catalogo/:id',
+    name: 'catalogo-detalhe',
+    component: AnimalInfo,
+    props: true
+  },
+
 ]
 
 const router = createRouter({
@@ -92,10 +105,24 @@ router.beforeEach((to, from, next) => {
   } else if (to.meta.requiresGuest) {
     if (isAutenticado.value) {
       return next({ name: 'specialist-area' })
+router.beforeEach((to, from, next) => {
+  const { isAutenticado } = useAuth()
+
+  if (to.meta.requiresAuth) {
+    if (isAutenticado.value) {
+      next()
+    } else {
+      next({ name: 'login', query: { redirect: to.fullPath } })
+    }
+  } else if (to.meta.requiresGuest) {
+    if (!isAutenticado.value) {
+      next()
+    } else {
+      next({ name: 'specialist-area' })
     }
   }
 
   next()
 })
 
-export default router   
+export default router
