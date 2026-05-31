@@ -49,10 +49,8 @@ const routes = [
     name: 'catalogo-detalhe',
     component: AnimalInfo,
     props: true
-    path: '/contato',
-    name: 'contato',
-    component: ContatoPage
-  }
+  },
+
 ]
 
 const router = createRouter({

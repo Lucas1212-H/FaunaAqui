@@ -90,7 +90,7 @@ const situacao = ref('')
 const descricao = ref('')
 
 const tipos = ['Ave', 'Réptil', 'Mamífero', 'Anfíbio', 'Artrópode', 'Outro']
-const situacoes = ['Ferido', 'Morto', 'Área de risco', 'Peçonhento', 'Ninho', 'Outro']
+const situacoes = ['Preso', 'Morto', 'Ferido', 'Avistado', 'Área de Risco', 'Outro']
 
 const enviarDados = () => {
   if (tipoAnimal.value && situacao.value) {

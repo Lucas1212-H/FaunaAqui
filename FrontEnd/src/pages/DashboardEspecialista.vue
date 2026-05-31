@@ -34,7 +34,7 @@
                     <td><small class="text-muted">{{ d.local }}</small></td>
                     <td><small>{{ d.data }}</small></td>
                     <td>
-                      <span :class="['badge rounded-pill', getStatusClass(d.status)]">
+                      <span :class="['badge rounded-pill', getSituacaoClass(d.status)]">
                         {{ d.status }}
                       </span>
                     </td>
@@ -72,44 +72,70 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import NavBar from '@/components/NavBar.vue';
 import CardsMetricas from '@/components/especialista/CardsMetricas.vue';
 import PainelAnalise from '@/components/especialista/PainelAnalise.vue';
 import ModalValidacao from '@/components/especialista/ModalValidacao.vue';
+import axios from 'axios';
 
 const selectedDenuncia = ref(null);
+const carregando = ref(true);
+const denuncias = ref([]) // array vazio para recebr o banco
 
-const denuncias = ref([
-  { id: 1, animal: 'Serpente', local: 'Reserva Ambiental', data: '29/04/2025', status: 'Morto' },
-  { id: 2, animal: 'Capivara', local: 'Parque do Lago', data: '27/04/2025', status: 'Ferido' },
-  { id: 3, animal: 'Gavião', local: 'Área Urbana Central', data: '25/04/2025', status: 'Avistado' },
-  { id: 4, animal: 'Lobo-Guará', local: 'Estrada da Ceasa', data: '24/04/2025', status: 'Morto' }
-]);
-
-const getStatusClass = (status) => {
-  if (status === 'Morto') return 'bg-danger';
-  if (status === 'Ferido') return 'bg-primary';
-  return 'bg-warning text-dark';
+// Função assincrona para buscar as denuncias no banco
+const buscarOcorrenciasPendentes = async () => {
+  try {
+    carregando.value = true;
+    const response = await axios.get('http://localhost:8000/api/ocorrencias/pendentes');
+    denuncias.value = response.data; // preenche o array com os dados
+  } catch (error) {
+    console.error('Error ao conectar com a API:', error);
+  } finally {
+    carregando.value = false;
+  }
+}
+ // Substitui o antigo getStatusClass focado na situação fisica do animal
+const getSituacaoClass = (situacao) => {
+  if (situacao === 'Morto') return 'bg-danger text-white';
+  if (situacao === 'Ferido') return 'bg-warning text-dark';
+  return 'bg-secondary text-white';
 };
 
-const handleValidar = (d) => {
-  selectedDenuncia.value = d;
+const handleValidar = (denuncia) => {
+  selectedDenuncia.value = denuncia;
 };
 
-const processarAprovacao = (dadosAprovacao) => {
-  console.log('Aprovando chamado com parecer técnico:', dadosAprovacao);
-  // Aqui você faria o seu commit de API futuramente
-  selectedDenuncia.value = null;
-  alert('Ocorrência validada e salva!');
+const processarAprovacao = async (denuncia, aprovado) => {
+  try {
+    await axios.put(`http://localhost:8000/api/ocorrencias/${denuncia.id}/validar`, { aprovado });
+
+    alert('Ocorrência avaliada com sucesso!');
+    selectedDenuncia.value = null;
+
+    buscarOcorrenciasPendentes();
+  } catch (error) {
+    console.error('Erro ao processar avaliação:', error);
+    alert('Erro ao processar avaliação da ocorrência.');
+  }
 };
 
-const gerarLaudo = (d) => {
-  alert(`Gerando Laudo Técnico em PDF para: ${d.animal}`);
+const gerarLaudo = (denuncia) => {
+  alert(`Gerar laudo para denúncia ID: ${denuncia.id}`);
 };
 
-const handleVerArquivados = () => console.log('Ver Arquivados');
-const handleGerenciarEspecies = () => console.log('Gerenciar Espécies');
+const handleVerArquivados = () => {
+  alert('Navegar para histórico completo de ocorrências.');
+};
+
+const handleGerenciarEspecies = () => {
+  alert('Navegar para gerenciamento de espécies.');
+};
+
+onMounted(() => {
+  buscarOcorrenciasPendentes();
+});
+
 </script>
 
 <style scoped>

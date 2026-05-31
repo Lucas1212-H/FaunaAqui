@@ -9,15 +9,26 @@
           <div class="card border-0 shadow rounded-4 overflow-hidden mix-container">
             <div class="row g-0 h-100 align-items-stretch painel-com-fina-divisao">
 
-              <PainelStatusDenuncia :passo-atual="passoAtual" />
+              <PainelStatusDenuncia v-if="!denunciaEnviada" :passo-atual="passoAtual" />
 
               <div class="col-12 col-md-8 bg-white p-3 p-sm-4 d-flex flex-column justify-content-start corpo-formulario">
 
                 <!-- Alerta de Erro -->
-                <div v-if="mensagemErro" class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
-                  {{ mensagemErro }}
-                  <button type="button" class="btn-close" @click="mensagemErro = ''"></button>
-                </div>
+                <UiMessage
+                  v-if="mensagemErro && !denunciaEnviada"
+                  type="error"
+                  title="Não foi possível enviar"
+                  :message="mensagemErro"
+                  @dismiss="mensagemErro = ''"
+                />
+
+                <UiMessage
+                  v-if="mensagemSucesso && !denunciaEnviada"
+                  type="success"
+                  title="Envio concluído"
+                  :message="mensagemSucesso"
+                  @dismiss="mensagemSucesso = ''"
+                />
 
                 <!-- Spinner de Carregamento -->
                 <div v-if="enviando" class="text-center py-5">
@@ -25,6 +36,14 @@
                     <span class="visually-hidden">Enviando...</span>
                   </div>
                   <p class="mt-3 text-muted">Enviando denuncia...</p>
+                </div>
+
+                <!-- Tela de Conclusão -->
+                <div v-else-if="denunciaEnviada" class="w-100 container-passos mx-auto">
+                  <PassoConclusao 
+                    @novaOcorrencia="iniciarNovaOcorrencia"
+                    @voltar="voltarParaInicio"
+                  />
                 </div>
 
                 <!-- Formulário -->
@@ -68,8 +87,10 @@ import PassoContato from '../pages/PassoContato.vue'
 import PassoDetalhes from '../pages/PassoDetalhes.vue'
 import PassoLocalizacao from '../pages/PassoLocalização.vue'
 import PassoFoto from '../pages/PassoFoto.vue'
+import PassoConclusao from '../pages/PassoConclusao.vue'
 import PainelStatusDenuncia from '../components/denuncia/PainelStatusDenuncia.vue'
 import NavBarPublic from '../components/NavBarPublic.vue'
+import UiMessage from '../components/UiMessage.vue'
 import { ocorrenciaService } from '../services/ocorrenciaService'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -77,6 +98,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 const passoAtual = ref(1)
 const enviando = ref(false)
 const mensagemErro = ref('')
+const mensagemSucesso = ref('')
+const denunciaEnviada = ref(false)
 
 const formData = reactive({
   categoria: '',
@@ -131,7 +154,7 @@ const finalizarFormulario = async (dadosFoto) => {
       denunciante_nome: formData.contatoNome,
       denunciante_contato_tipo: formData.contato.tipo,
       denunciante_contato_valor: formData.contato.valor,
-      categoria_ocorrencia: formData.categoria,
+      distincao_biologica: formData.categoria,
       tipo_animal: formData.tipoAnimal,
       situacao_animal: formData.situacao,
       descricao: formData.descricao,
@@ -144,10 +167,11 @@ const finalizarFormulario = async (dadosFoto) => {
     // Envia para o backend
     const resposta = await ocorrenciaService.criarDenuncia(dadosParaEnviar)
     
-    // Sucesso
-    alert('Ocorrência enviada com sucesso!')
+    // Sucesso - mostra tela de conclusão
+    mensagemErro.value = ''
+    denunciaEnviada.value = true
     
-    // Reseta o formulário
+    // Reseta o formulário internal
     passoAtual.value = 1
     formData.categoria = ''
     formData.contatoNome = ''
@@ -165,6 +189,18 @@ const finalizarFormulario = async (dadosFoto) => {
   } finally {
     enviando.value = false
   }
+}
+
+const iniciarNovaOcorrencia = () => {
+  // Reinicia o fluxo
+  denunciaEnviada.value = false
+  passoAtual.value = 1
+  mensagemSucesso.value = ''
+  mensagemErro = ''
+}
+
+const voltarParaInicio = () => {
+  // Já será tratado pelo PassoConclusao via router
 }
 </script>
 

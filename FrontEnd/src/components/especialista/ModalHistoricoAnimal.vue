@@ -15,7 +15,7 @@
           <div class="info-box mt-3">
             <div><strong>Denunciante:</strong> {{ item.denunciante || item.reporter || 'Anônimo' }}</div>
             <div><strong>Data:</strong> {{ item.data || item.date || '-' }}</div>
-            <div><strong>Tipo:</strong> {{ item.tipo || item.type || '-' }}</div>
+            <div><strong>Distinção Biológica:</strong> {{ item.distincaoBiologica || item.tipo || item.type || 'Tipo não informado' }}</div>
             <div><strong>Local:</strong> {{ item.local || '-' }}</div>
           </div>
         </div>
