@@ -7,7 +7,6 @@ import DenunciaView from '../views/DenunciaView.vue'
 import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
 import AnimalInfo from '../components/AnimalInfo.vue'
 import { useAuth } from '../composables/useAuth'
-
 const routes = [
   {
     path: '/',
@@ -48,7 +47,8 @@ const routes = [
     name: 'catalogo-detalhe',
     component: AnimalInfo,
     props: true
-  }
+  },
+
 ]
 
 const router = createRouter({

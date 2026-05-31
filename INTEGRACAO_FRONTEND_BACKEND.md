@@ -68,7 +68,7 @@ O frontend envia os dados no seguinte formato:
   "denunciante_nome": "João Silva",
   "denunciante_contato_tipo": "telefone",
   "denunciante_contato_valor": "(11) 99999-9999",
-  "categoria_ocorrencia": "silvestre",
+  "distincao_biologica": "silvestre",
   "tipo_animal": "Ave",
   "situacao_animal": "Ferido",
   "descricao": "Descrição do animal",

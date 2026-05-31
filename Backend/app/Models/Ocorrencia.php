@@ -18,7 +18,7 @@ class Ocorrencia extends Model
         'denunciante_nome',
         'denunciante_contato_tipo',
         'denunciante_contato_valor',
-        'categoria_ocorrencia',
+        'distincao_biologica',
         'tipo_animal',
         'situacao_animal',
         'descricao_ocorrencia',

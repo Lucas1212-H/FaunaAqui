@@ -6,6 +6,7 @@ use App\Models\Especie;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class EspecieController extends Controller
 {
@@ -40,6 +41,24 @@ class EspecieController extends Controller
         $especie = Especie::create($dados);
 
         return response()->json($especie->load('categoria'), 201);
+    }
+
+    public function show(int $id)
+    {
+        $especie = Especie::with([
+            'categoria:id_categoria,nome_popular,nome_cientifico,foto',
+            'ocorrencias' => function ($query) {
+                $query->select('id', 'especie_id', 'latitude', 'longitude', 'situacao_animal', 'ponto_referencia', 'created_at');
+            }
+            ])
+            ->where('id_especie', $id)
+            ->first();
+
+        if (! $especie) {
+            return response()->json(['message' => 'Espécie não encontrada'], 404);
+        }
+
+        return response()->json($especie);
     }
 
     public function update(Request $request, int $id)
@@ -90,5 +109,27 @@ class EspecieController extends Controller
         $especie->delete();
 
         return response()->json(['message' => 'Espécie excluída com sucesso']);
+    }
+    public function vincularOcorrencias(Request $request, int $id)
+    {
+        $especie = Especie::where('id_especie', $id)->first();
+
+        if (! $especie) {
+            return response()->json(['message' => 'Espécie não encontrada'], 404);
+        }
+
+        $dados = $request->validate([
+            'ocorrencias_ids' => ['required', 'array'],
+            'ocorrencias_ids.*' => ['integer'],
+        ]);
+
+        DB::table('ocorrencias')
+            ->whereIn('id', $dados['ocorrencias_ids'])
+            ->update(['especie_id' => $especie->id_especie]);
+
+        return response()->json([
+            'message' => 'Ocorrências vinculadas à espécie com sucesso!',
+            'quantidade_vinculada' => count($dados['ocorrencias_ids']),
+        ], 200);
     }
 }

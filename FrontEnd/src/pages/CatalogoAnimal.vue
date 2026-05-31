@@ -50,7 +50,7 @@
 
         <div class="row row-cols-1 row-cols-md-3 g-4">
           <div class="col" v-for="especie in (categoriaSelecionada?.especies || [])" :key="especie.id_especie">
-            <article class="card h-100 shadow-sm border-0 overflow-hidden rounded-3">
+            <article class="card h-100 shadow-sm border-0 overflow-hidden rounded-3" style="cursor: pointer;" @click="IrParaDetalhes(especie.id_especie)">
               <img 
                 :src="especie.foto ? `http://localhost:8000/storage/${especie.foto}` : 'https://picsum.photos/seed/fauna/300/200'" 
                 :alt="especie.nome_popular" 
@@ -130,6 +130,40 @@
               <label class="form-label">Descrição</label>
               <textarea class="form-control" v-model="formEspecie.descricao" rows="3" placeholder="Ex: Descrição da espécie..."></textarea>
             </div>
+
+            <hr>
+
+            <div class="mb-2">
+              <label class="form-label fw-semibold">Atribuir ocorrências publicadas</label>
+              <p class="small text-muted mb-2">Selecione as ocorrências já publicadas no mapa que pertencem a esta espécie.</p>
+
+              <div v-if="carregandoOcorrencias" class="text-center py-3">
+                <div class="spinner-border spinner-border-sm text-success" role="status"></div>
+                <small class="text-muted ms-2">Carregando ocorrências publicadas...</small>
+              </div>
+
+              <div v-else-if="ocorrenciasPublicadas.length > 0" class="border rounded p-2" style="max-height: 220px; overflow-y: auto;">
+                <label
+                  v-for="ocorrencia in ocorrenciasPublicadas"
+                  :key="ocorrencia.id"
+                  class="d-block border rounded p-2 mb-2"
+                >
+                  <input
+                    type="checkbox"
+                    class="form-check-input me-2"
+                    :value="ocorrencia.id"
+                    v-model="ocorrenciasSelecionadas"
+                  >
+                  <span class="fw-semibold">{{ ocorrencia.tipo_animal || 'Animal não informado' }}</span>
+                  <small class="d-block text-muted">{{ ocorrencia.ponto_referencia || 'Local não informado' }}</small>
+                  <small class="d-block text-muted">{{ new Date(ocorrencia.created_at).toLocaleDateString('pt-BR') }}</small>
+                </label>
+              </div>
+
+              <div v-else class="alert alert-light border text-center py-2 mb-0">
+                Nenhuma ocorrência publicada disponível para vínculo.
+              </div>
+            </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" @click="modalNovaEspecie = false">Cancelar</button>
@@ -165,6 +199,11 @@ export default {
       // Modais
       modalNovaCategoria: false,
       modalNovaEspecie: false,
+
+      // Ocorrências publicadas para vincular na criação de espécie
+      carregandoOcorrencias: false,
+      ocorrenciasPublicadas: [],
+      ocorrenciasSelecionadas: [],
       
       // Formulários
       formCategoria: {
@@ -264,6 +303,13 @@ export default {
           alert('Selecione uma categoria primeiro!');
           return;
         }
+
+        const categoriaId = this.categoriaSelecionada.id_categoria || this.categoriaSelecionada.id;
+
+        if (!categoriaId) {
+          alert('Categoria inválida. Reabra a categoria e tente novamente.');
+          return;
+        }
         
         if (!this.formEspecie.nome_cientifico || !this.formEspecie.nome_popular) {
           alert('Preencha todos os campos obrigatórios!');
@@ -271,7 +317,7 @@ export default {
         }
         
         const formData = new FormData();
-        formData.append('id_categoria', this.categoriaSelecionada.id_categoria);
+        formData.append('id_categoria', String(categoriaId));
         formData.append('nome_cientifico', this.formEspecie.nome_cientifico);
         formData.append('nome_popular', this.formEspecie.nome_popular);
         formData.append('descricao', this.formEspecie.descricao);
@@ -279,18 +325,27 @@ export default {
           formData.append('foto', this.formEspecie.foto);
         }
         
-        await axios.post('http://localhost:8000/api/especies', formData, {
+        const responseCriacao = await axios.post('http://localhost:8000/api/especies', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
+
+        const novaEspecieId = responseCriacao.data?.id_especie || responseCriacao.data?.id;
+
+        if (novaEspecieId && this.ocorrenciasSelecionadas.length > 0) {
+          await axios.post(`http://localhost:8000/api/especies/${novaEspecieId}/vincular-ocorrencias`, {
+            ocorrencias_ids: this.ocorrenciasSelecionadas
+          });
+        }
         
         // Limpar formulário e fechar modal
         this.formEspecie = { nome_cientifico: '', nome_popular: '', foto: null, descricao: '' };
+        this.ocorrenciasSelecionadas = [];
         this.modalNovaEspecie = false;
         
         // Recarregar categoria com suas espécies
-        const response = await axios.get(`http://localhost:8000/api/categorias/${this.categoriaSelecionada.id_categoria}`);
+        const response = await axios.get(`http://localhost:8000/api/categorias/${categoriaId}`);
         const dados = response.data;
         if (!dados.especies) {
           dados.especies = [];
@@ -300,7 +355,40 @@ export default {
         alert('Espécie criada com sucesso!');
       } catch (error) {
         console.error('Erro ao criar espécie:', error);
-        alert('Erro ao criar espécie. Verifique o console para mais detalhes.');
+        const errosValidacao = error?.response?.data?.errors;
+        if (errosValidacao) {
+          const primeiraChave = Object.keys(errosValidacao)[0];
+          const primeiraMensagem = primeiraChave ? errosValidacao[primeiraChave][0] : null;
+          alert(primeiraMensagem || 'Dados inválidos para criar espécie.');
+          return;
+        }
+
+        const mensagem = error?.response?.data?.message;
+        alert(mensagem || 'Erro ao criar espécie. Verifique o console para mais detalhes.');
+      }
+    },
+    async buscarOcorrenciasPublicadas() {
+      try {
+        this.carregandoOcorrencias = true;
+        const response = await axios.get('http://localhost:8000/api/ocorrencias/publicados');
+        this.ocorrenciasPublicadas = response.data || [];
+      } catch (error) {
+        console.error('Erro ao carregar ocorrências publicadas:', error);
+        this.ocorrenciasPublicadas = [];
+      } finally {
+        this.carregandoOcorrencias = false;
+      }
+    },
+    IrParaDetalhes(id_especie) {
+      // Navega para a rota de detalhe do catálogo (AnimalInfo)
+      this.$router.push({ name: 'catalogo-detalhe', params: { id: id_especie } });
+    }
+  },
+  watch: {
+    modalNovaEspecie(valor) {
+      if (valor) {
+        this.ocorrenciasSelecionadas = [];
+        this.buscarOcorrenciasPublicadas();
       }
     }
   },

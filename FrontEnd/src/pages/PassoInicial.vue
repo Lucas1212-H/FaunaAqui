@@ -40,21 +40,6 @@
         <span class="text-muted small">➔</span>
       </div>
 
-      <div 
-        @click="selecionar('ninho')" 
-        class="d-flex align-items-center p-3 border rounded-4 cursor-pointer hover-shadow transition-all"
-        role="button"
-      >
-        <div class="d-flex align-items-center justify-content-center rounded-3 fs-5 me-3 bg-primary bg-opacity-10" style="width: 40px; height: 40px;">
-          🪶
-        </div>
-        <div class="flex-grow-1">
-          <h3 class="m-0 fs-6 fw-semibold text-dark">Ninho ou filhotes</h3>
-          <p class="m-0 small text-muted" style="font-size: 12px;">Abandono ou risco</p>
-        </div>
-        <span class="text-muted small">➔</span>
-      </div>
-
     </div>
 
     <div class="text-uppercase text-muted fw-bold mt-2 mb-2" style="font-size: 0.7rem; letter-spacing: 0.8px;">

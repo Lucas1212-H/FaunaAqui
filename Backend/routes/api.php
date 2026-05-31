@@ -21,5 +21,8 @@ Route::delete('/categorias/{id}', [CategoriaController::class, 'destroy']);
 
 Route::get('/especies', [EspecieController::class, 'index']);
 Route::post('/especies', [EspecieController::class, 'store']);
+Route::get('/especies/{id}', [EspecieController::class, 'show']);
 Route::put('/especies/{id}', [EspecieController::class, 'update']);
 Route::delete('/especies/{id}', [EspecieController::class, 'destroy']);
+
+Route::post('/especies/{id}/vincular-ocorrencias', [EspecieController::class, 'vincularOcorrencias']);
