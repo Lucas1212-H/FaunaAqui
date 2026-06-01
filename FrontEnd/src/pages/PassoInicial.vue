@@ -50,7 +50,7 @@
       
       <div class="d-flex align-items-center py-3 border-bottom border-light">
         <div class="d-flex align-items-center justify-content-center rounded-circle me-3 bg-danger bg-opacity-10" style="width: 32px; height: 32px;">
-          📍
+           
         </div>
         <div class="flex-grow-1">
           <h4 class="m-0 small fw-medium text-dark" style="font-size: 14px;">Serpente — Bloco A</h4>
@@ -61,7 +61,7 @@
 
       <div class="d-flex align-items-center py-3">
         <div class="d-flex align-items-center justify-content-center rounded-circle me-3 bg-success bg-opacity-10" style="width: 32px; height: 32px;">
-          📍
+           
         </div>
         <div class="flex-grow-1">
           <h4 class="m-0 small fw-medium text-dark" style="font-size: 14px;">Ave ferida — Estacionamento</h4>

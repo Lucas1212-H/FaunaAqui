@@ -53,8 +53,9 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onMounted, watch } from 'vue';
 import axios from 'axios';
+import { useRoute, useRouter } from 'vue-router';
 import NavBar from '@/components/NavBar.vue';
 import ModalValidacao from '@/components/especialista/ModalValidação.vue';
 import ModalHistoricoAnimal from '@/components/especialista/ModalHistoricoAnimal.vue';
@@ -66,7 +67,11 @@ import PublicadosPainel from '@/pages/especialista/PublicadosPainel.vue';
 
 const selectedDenuncia = ref(null);
 const historicoSelecionado = ref(null);
-const abaAtiva = ref('triagem');
+const route = useRoute();
+const router = useRouter();
+const abasValidas = new Set(['triagem', 'arquivadas', 'publicados']);
+const normalizarAba = (valor) => (abasValidas.has(String(valor)) ? String(valor) : 'triagem');
+const abaAtiva = ref(normalizarAba(route.query.aba));
 const carregando = ref(true);
 
 const denunciasTriagem = ref([]);
@@ -141,7 +146,20 @@ const mudarAba = (aba) => {
   abaAtiva.value = aba;
   selectedDenuncia.value = null;
   historicoSelecionado.value = null;
+  
+  router.replace({
+    name: 'specialist-area',
+    query: { ...route.query, aba },
+  });
 };
+onMounted(() => { buscarDadosDoBanco(); });
+
+watch(
+  () => route.query.aba,
+  (novaAba) => {
+    abaAtiva.value = normalizarAba(novaAba);
+  }
+);
 
 const handleValidar = (d) => {
   historicoSelecionado.value = null;
@@ -194,7 +212,7 @@ const handlePublicar = async ({ denunciaId }) => {
       status: 'Publicado'
     });
     selectedDenuncia.value = null;
-    alert('Ocorrência publicada no mapa! 📍');
+    alert('Ocorrência publicada no mapa!  ');
     buscarDadosDoBanco();
   } catch (error) {
     alert("Erro ao publicar.");
@@ -209,7 +227,7 @@ const handlePublicarHistorico = async (item) => {
     });
     historicoSelecionado.value = null;
     abaAtiva.value = 'publicados';
-    alert('Ocorrência publicada no mapa! 📍');
+    alert('Ocorrência publicada no mapa!  ');
     await buscarDadosDoBanco();
   } catch (error) {
     alert('Erro ao publicar.');

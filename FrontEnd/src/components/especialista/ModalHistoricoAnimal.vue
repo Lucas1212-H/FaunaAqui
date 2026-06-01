@@ -42,7 +42,7 @@
 
           <div v-if="item.statusFinal === 'Resolvido' || item.status === 'Resolvido'" class="mt-3 d-grid">
             <button class="btn btn-outline-info fw-semibold" @click="$emit('publicar', item)">
-              📍 Publicar no Mapa
+               Publicar no Mapa
             </button>
           </div>
         </div>

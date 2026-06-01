@@ -33,7 +33,6 @@
       <div class="form-text small text-muted mt-1">
         {{ contatoTipo === 'email' ? 'Use um e-mail válido.' : 'Digite somente números, sem espaços, parênteses ou traços.' }}
       </div>
-      <input v-model="contatoValor" :placeholder="contatoTipo === 'email' ? 'seu@email.com' : '(99) 99999-9999'" class="form-control shadow-none rounded-3" />
     </div>
 
     <button 

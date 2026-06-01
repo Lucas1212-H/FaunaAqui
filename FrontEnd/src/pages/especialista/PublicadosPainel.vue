@@ -4,7 +4,7 @@
       <div class="map-card p-4 shadow-sm">
         
         <header class="mb-4">
-          <h4 class="fw-bold m-0 text-dark">📍 Mapa de Distribuição da Fauna</h4>
+          <h4 class="fw-bold m-0 text-dark">  Mapa de Distribuição da Fauna</h4>
           <small class="text-muted">Abaixo estão mapeadas todas as ocorrências validadas e publicadas no campus</small>
         </header>
 

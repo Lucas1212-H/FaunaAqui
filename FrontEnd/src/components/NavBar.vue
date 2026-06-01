@@ -1,17 +1,17 @@
 <template>
   <nav class="navbar-especialista d-flex align-items-center justify-content-between px-4">
     <div class="navbar-brand-container">
-      <h1 class="m-0 brand-text">ConViva <span>Labev</span></h1>
-      
-
+      <RouterLink class="brand-link text-decoration-none" :to="{ name: 'specialist-area' }">
+        <h1 class="m-0 brand-text">ConViva <span>Labev</span></h1>
+      </RouterLink>
     </div>
 
     <div class="nav-pill-container">
       <div class="nav-pill-bg d-flex align-items-center justify-content-around">
         
-        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'triagem' }" @click.prevent="$emit('mudarAba', 'triagem')">Início</a>
-        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'arquivadas' }" @click.prevent="$emit('mudarAba', 'arquivadas')">Denuncias Arquivadas</a>
-        <a href="#" class="nav-item-link" :class="{ active: abaAtiva === 'publicados' }" @click.prevent="$emit('mudarAba', 'publicados')">Publicados</a>
+        <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'triagem' }" @click="selecionarAba('triagem')">Início</button>
+        <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'arquivadas' }" @click="selecionarAba('arquivadas')">Denuncias Arquivadas</button>
+        <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'publicados' }" @click="selecionarAba('publicados')">Publicados</button>
       </div>
     </div>
 
@@ -44,17 +44,26 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
-defineProps({
+const props = defineProps({
   abaAtiva: {
     type: String,
-    default: 'triagem'
+    default: undefined
   }
 })
 
-defineEmits(['mudarAba'])
+const emit = defineEmits(['mudarAba'])
 
 const router = useRouter()
 const { usuarioLogado, logout } = useAuth()
+
+const selecionarAba = (aba) => {
+  if (props.abaAtiva !== undefined) {
+    emit('mudarAba', aba)
+    return
+  }
+
+  router.push({ name: 'specialist-area', query: { aba } })
+}
 
 const inicialNome = computed(() => {
   const nome = usuarioLogado.value?.nome || 'U'
@@ -72,6 +81,11 @@ const fazerLogout = () => {
   background-color: #58d68d; /* Verde principal do seu mockup */
   height: 80px;
   width: 100%;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: center;
 }
 
 .brand-text {
@@ -108,6 +122,11 @@ const fazerLogout = () => {
   border-radius: 30px;
   transition: all 0.3s ease;
   font-size: 0.95rem;
+}
+
+.nav-button {
+  border: 0;
+  background: transparent;
 }
 
 .nav-item-link:hover {

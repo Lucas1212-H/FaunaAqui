@@ -16,7 +16,7 @@
 
       <div class="bg-white p-3 border-top border-light-subtle text-dark small">
         <div v-if="coordenadas" class="text-success fw-medium">
-          📍 Cadastrado: <span class="text-muted">{{ coordenadas.lat.toFixed(5) }}, {{ coordenadas.lng.toFixed(5) }}</span>
+            Cadastrado: <span class="text-muted">{{ coordenadas.lat.toFixed(5) }}, {{ coordenadas.lng.toFixed(5) }}</span>
         </div>
         <div v-else class="text-danger animate-pulse">
           🌐 Toque no mapa para marcar a localização exata
@@ -69,7 +69,7 @@ let marker = null
 // Inicializa o mapa assim que o HTML for renderizado na tela
 onMounted(() => {
   // Coordenadas centrais aproximadas da UFPA Campus Guamá
-  const centroUFPA = [-1.4748, -48.4452]
+  const centroUFPA = [-1.4748, -48.4542]
 
   // Configura o mapa
   map = L.map('mapa-ufpa', {

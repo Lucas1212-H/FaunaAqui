@@ -9,9 +9,7 @@ import QuemSomos from '../views/QuemSomos.vue'
 import BlogView from '../views/BlogView.vue'
 import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
 import AnimalInfo from '../components/AnimalInfo.vue'
-import ContatoPage from '../pages/ContatoPage.vue'
 import { useAuth } from '../composables/useAuth'
-import CatalogoAnimal from '../pages/CatalogoAnimal.vue'
 
 const routes = [
   {
@@ -60,17 +58,14 @@ const routes = [
     path: '/blog',
     name: 'blog',
     component: BlogView,
-    meta: { title: 'Blog' }
-    component: DenunciaView
+    meta: { title: 'Blog' },
   },
   {
     path: '/catalogo',
     name: 'catalogo',
     component: CatalogoAnimal,
-    meta: { title: 'Catálogo Animal' }
-    component: CatalogoAnimal
-  }
-  ,
+    meta: { title: 'Catálogo Animal' },
+  },
   {
     path: '/catalogo/:id',
     name: 'catalogo-detalhe',
@@ -105,20 +100,6 @@ router.beforeEach((to, from, next) => {
   } else if (to.meta.requiresGuest) {
     if (isAutenticado.value) {
       return next({ name: 'specialist-area' })
-router.beforeEach((to, from, next) => {
-  const { isAutenticado } = useAuth()
-
-  if (to.meta.requiresAuth) {
-    if (isAutenticado.value) {
-      next()
-    } else {
-      next({ name: 'login', query: { redirect: to.fullPath } })
-    }
-  } else if (to.meta.requiresGuest) {
-    if (!isAutenticado.value) {
-      next()
-    } else {
-      next({ name: 'specialist-area' })
     }
   }
 
