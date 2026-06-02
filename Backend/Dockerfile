@@ -8,14 +8,14 @@ COPY composer.json composer.lock ./
 COPY . /app
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
-# Runtime: PHP with extensions
-FROM php:8.1-cli
+# Runtime: PHP com a versão atualizada para 8.4 para satisfazer as dependências do Composer
+FROM php:8.4-cli
 WORKDIR /app
 
-# Install system dependencies and PHP extensions
+# Instala dependências do sistema, extensões PHP e o Python3
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-       libzip-dev zip unzip libpng-dev libonig-dev libxml2-dev git curl \
+       libzip-dev zip unzip libpng-dev libonig-dev libxml2-dev git curl python3 \
     && docker-php-ext-install pdo pdo_mysql mbstring zip exif bcmath pcntl \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -28,11 +28,14 @@ RUN mkdir -p /app/storage /app/bootstrap/cache \
     && chown -R www-data:www-data /app/storage /app/bootstrap/cache \
     && chmod -R 775 /app/storage /app/bootstrap/cache
 
+# Dá permissão de execução para o seu script de inicialização
+RUN chmod +x /app/start-mysql.sh
+
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV PORT=8080
 
 EXPOSE 8080
 
-# Render-friendly startup: executa o package:discover que pulamos antes, limpa/gera caches, migra e inicia
-CMD ["sh","-lc","php artisan package:discover --ansi && php artisan config:cache || true && php artisan route:cache || true && php artisan view:cache || true && php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=${PORT}"]
+# Executa o comando via shell string para garantir a expansão correta das variáveis de ambiente e roda o script
+CMD sh -c "php artisan package:discover --ansi && php artisan config:cache || true && php artisan route:cache || true && php artisan view:cache || true && php artisan migrate --force || true /app/start-mysql.sh"
