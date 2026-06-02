@@ -1,6 +1,6 @@
 <template>
   <div class="animal-info-page">
-    <NavBarPublic />
+    <NavBar />
 
     <main class="container py-4 py-lg-5">
       <section v-if="carregando" class="state-panel text-center py-5" aria-live="polite">
@@ -89,7 +89,8 @@
   </div>
 </template>
 <script>
-import NavBarPublic from '@/components/NavBarPublic.vue';
+
+import NavBar from '@/components/NavBar.vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import axios from 'axios';
@@ -98,7 +99,7 @@ import 'leaflet/dist/leaflet.css';
 
 export default {
   components: {
-    NavBarPublic
+    NavBar
   },
   data() {
     return {

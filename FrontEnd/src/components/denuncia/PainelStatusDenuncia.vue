@@ -1,9 +1,9 @@
 <template>
   <div class="col-md-5 col-lg-4 bg-success text-white p-4 d-none d-md-flex flex-column justify-content-between painel-lateral">
     <div>
-      <div class="d-flex align-items-center gap-1 mb-3">
-        <img src="/home/lucas/Documentos/MeusProjetos/Outros Proj./FaunaAqui/FaunaAqui/FrontEnd/src/assets/images/conviva.png" alt="ConViva" height="40px" width="auto">
-        <h2 class="h2 m-0 fw-bold tracking-wider ">ConViva</h2>
+      <div class="d-flex align-items-center gap-2 mb-3">
+        <img src="@/assets/images/logo_sf.png" alt="ConViva" style="width: 40px; height: 40px;" >
+        <h2 class="h5 m-0 fw-bold tracking-wider"">ConViva</h2>
       </div>
       <p class="small text-white-50 lh-sm">Sistema de Monitoramento e Registro de Ocorrências Animais no Campus.</p>
     </div>

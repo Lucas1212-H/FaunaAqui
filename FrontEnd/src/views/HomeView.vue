@@ -1,119 +1,111 @@
 <template>
   <div class="home-page">
     <NavBarPublic />
-
-    <section class="hero-banner position-relative d-flex align-items-end p-5">
-      <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
-      <div class="position-absolute bottom-0 start-0 w-100 d-flex justify-content-start pb-5 pt-5 text-white z-index-2">
-        <div class="p-0 ps-5 m-0" style="max-width: 650px; width: 100%;">
-          <h1 class="fw-bold mb-4" style="font-size: 2.5rem; line-height: 1.2;">
-            Entre Macacos, Sapos, Cobras e Lagartos, salvam-se todos!
-          </h1>
-          <h2 class="fw-medium m-0 opacity-90" style="font-size: 1.5rem; line-height: 1.4;">
-            Projeto de Coexistência e Conservação de Animais Silvestres no Campus da UFPA
-          </h2>
-        </div>
-      </div>
-        
-    </section>
     
-    <main>
-      <section class="py-5 report-map-section">
-        <div class="container">
-          <div class="row align-items-stretch justify-content-center g-4">
-            
-            <div class="col-12 col-lg-5 d-flex">
-              <aside class="hero-card report-card p-4 p-md-5 w-100 h-100 d-flex flex-column justify-content-center">
-                <span class="report-kicker mb-3">Reporte de forma rápida</span>
-                <h2 class="report-card-title fw-bold mb-3">Encontrou um animal silvestre na região?</h2>
-                <p class="report-card-text mb-4">Ajude a ciência e a preservação local informando a localização exata com apenas alguns cliques.</p>
-                <button @click="irParaDenuncia" class="btn btn-success btn-lg fw-bold px-5 py-3 shadow-sm align-self-start">Denuncie Aqui</button>
-              </aside>
-            </div>
+    <header class="hero-banner position-relative d-flex align-items-end">
+      <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
+      <div class="container-fluid px-5 pb-5 position-relative z-index-2 text-white">
+        <h1 class="display-4 fw-bold m-0 hero-title">Home</h1>
+      </div>
+      <aside class="banner-text-right position-absolute end-0 top-50 translate-middle-y pe-5 text-white" style="max-width: 450px;">
+        <p class="fs-5 fw-light lh-lg">
+          Entre macacos, sapos, cobras e lagartos, SALVAM-SE TODOS! Projeto de coexistência e conservação de animais silvestres no campus da UFPA
+        </p>
+      </aside>
+    </header>
 
-            <div class="col-12 col-lg-6 d-flex">
-              <div class="report-map-card w-100 h-100">
-                <div id="mapa-fauna" class="mapa-fauna" role="application" aria-label="Mapa de avistamentos de fauna silvestre"></div>
-              </div>
-            </div>
-
-          </div>
+    <main class="container position-relative text-white">
+      <section class="row align-items-center">
+        <div class="col-lg-6 px-10">
+          <article class="hero-card shadow-lg">
+            <h2 class="display-10 fw-bold text-dark">Encontrou um animal silvestre na região?</h2>
+            <p class="lead text-dark">Ajude a ciência e a preservação local com apenas alguns cliques.</p>
+            <button @click="irParaDenuncia" class="btn btn-warning btn-lg fw-bold mt-3 px-5 py-3">Denuncie Aqui</button>
+          </article>
+        </div>
+        <div class="col-lg-6 p-5">
+          <div id="mapa-fauna" class="rounded-4 shadow-sm" style="height: 350px;"></div>
         </div>
       </section>
       <section class="py-5 catalog-section">
         <div class="container position-relative px-md-5">
           <h2 class="fw-bold mb-2 pb-3 text-center section-title">Animais Catalogados</h2>
           
-          <div v-if="carregandoAnimaisCatalogados" class="catalog-state text-center py-5">
-            <div class="spinner-border text-success" role="status" aria-label="Carregando animais catalogados"></div>
-            <p class="text-muted mt-3 mb-0">Carregando animais catalogados...</p>
-          </div>
-
-          <div v-else-if="erroAnimaisCatalogados" class="alert alert-warning border-0 shadow-sm" role="alert">
-            {{ erroAnimaisCatalogados }}
-          </div>
-
-          <div v-else-if="animaisExibidos.length === 0" class="alert alert-light border shadow-sm text-center py-4" role="status">
-            Nenhuma espécie catalogada.
-          </div>
-
-          <div v-else id="catalogoAnimaisCarousel" class="carousel slide catalog-carousel" data-bs-ride="carousel">
-            
-            <div class="carousel-indicators">
-              <button
-                v-for="(grupo, index) in animaisAgrupados"
-                :key="index"
-                type="button"
-                data-bs-target="#catalogoAnimaisCarousel"
-                :data-bs-slide-to="index"
-                :class="{ active: index === 0 }"
-                :aria-current="index === 0 ? 'true' : 'false'"
-                :aria-label="`Slide ${index + 1}`"
-              ></button>
+          <template v-if="carregandoAnimaisCatalogados">
+            <div class="text-center py-5">
+              <div class="spinner-border text-success" role="status" aria-label="Carregando animais catalogados"></div>
+              <p class="text-muted mt-3 mb-0">Carregando animais catalogados...</p>
             </div>
+          </template>
 
-            <div class="carousel-inner">
-              <div
-                v-for="(grupo, index) in animaisAgrupados"
-                :key="index"
-                class="carousel-item"
-                :class="{ active: index === 0 }"
-              >
-                <div class="row g-4 justify-content-center px-2">
-                  <div 
-                    v-for="animal in grupo" 
-                    :key="animal.id" 
-                    class="col-12 col-md-6 col-lg-4"
-                  >
-                    <article class="catalog-card h-100 shadow-sm overflow-hidden d-flex flex-column">
-                      <figure class="catalog-image-wrap m-0">
+          <template v-else-if="erroAnimaisCatalogados">
+            <div class="alert alert-warning border-0 shadow-sm" role="alert">
+              {{ erroAnimaisCatalogados }}
+            </div>
+          </template>
+
+          <template v-else-if="animaisExibidos.length === 0">
+            <div class="alert alert-light border shadow-sm text-center py-4" role="status">
+              Nenhuma espécie catalogada.
+            </div>
+          </template>
+
+          <template v-else>
+            <div id="catalogoAnimaisCarousel" class="carousel slide catalog-carousel" data-bs-ride="carousel">
+              <div class="carousel-indicators">
+                <button
+                  v-for="(grupo, index) in animaisAgrupados"
+                  :key="index"
+                  type="button"
+                  data-bs-target="#catalogoAnimaisCarousel"
+                  :data-bs-slide-to="index"
+                  :class="{ active: index === 0 }"
+                  :aria-current="index === 0 ? 'true' : 'false'"
+                  :aria-label="`Slide ${index + 1}`"
+                ></button>
+              </div>
+
+              <div class="carousel-inner">
+                <section
+                  v-for="(grupo, index) in animaisAgrupados"
+                  :key="index"
+                  class="carousel-item"
+                  :class="{ active: index === 0 }"
+                >
+                  <div class="row g-4 justify-content-center px-2">
+                    <article 
+                      v-for="animal in grupo" 
+                      :key="animal.id" 
+                      class="col-12 col-md-6 col-lg-4 catalog-card shadow-sm h-100"
+                    >
+                      <figure class="m-0 overflow-hidden rounded-top">
                         <img :src="animal.imagem" :alt="animal.nome" class="catalog-image w-100 h-100" />
                       </figure>
-                      <div class="p-4 d-flex flex-column flex-grow-1 justify-content-between">
+                      <div class="p-4 d-flex flex-column justify-content-between h-100">
                         <div>
-                          <span class="badge rounded-pill text-bg-success align-self-start mb-2">{{ animal.categoria }}</span>
+                          <span class="badge rounded-pill text-bg-success mb-2">{{ animal.categoria }}</span>
                           <h3 class="h4 fw-bold mb-1 text-dark text-truncate">{{ animal.nome }}</h3>
                           <p class="text-secondary small fst-italic mb-3 text-truncate">{{ animal.nomeCientifico }}</p>
-                          <p class="catalog-description text-body-secondary small mb-4 linha-limitada">{{ animal.descricao }}</p>
+                          <p class="text-body-secondary small mb-0 linha-limitada">{{ animal.descricao }}</p>
                         </div>
                       </div>
                     </article>
                   </div>
-                </div>
+                </section>
               </div>
-            </div>
 
-            <template v-if="animaisAgrupados.length > 1">
-              <button class="carousel-control-prev" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Anterior</span>
-              </button>
-              <button class="carousel-control-next" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="visually-hidden">Próximo</span>
-              </button>
-            </template>
-          </div>
+              <template v-if="animaisAgrupados.length > 1">
+                <button class="carousel-control-prev" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Próximo</span>
+                </button>
+              </template>
+            </div>
+          </template>
         </div>
       </section>
     </main>
@@ -290,70 +282,24 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.hero-section {
-  min-height: 40vh;
+.hero-banner {
+  min-height: 400px;
   background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
-  position: relative;
 }
 
-.overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+.hero-overlay {
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
-.report-map-section {
-  background: linear-gradient(180deg, #f7fbf8 0%, #eef6ef 100%);
+
+.hero-card { 
+  background: color#eef6ec; 
+  padding: 3rem; border: ; 
+  backdrop-filter: blur(8px); 
 }
 
-.hero-card {
-  border: 1px solid rgba(20, 83, 45, 0.08);
-  background-color: #ffffff;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  border-radius: 28px;
-}
-
-.report-kicker {
-  display: inline-flex;
-  align-self: flex-start;
-  padding: 0.4rem 0.85rem;
-  border-radius: 999px;
-  background: rgba(132, 204, 22, 0.12);
-  color: #14532d;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.report-card-title {
-  color: #0f172a;
-  font-size: clamp(1.9rem, 2vw, 2.6rem);
-  line-height: 1.15;
-}
-
-.report-card-text {
-  color: #475569;
-  font-size: 1.05rem;
-  line-height: 1.6;
-  max-width: 34rem;
-}
-
-.report-map-card {
-  display: flex;
-  min-height: 100%;
-  background: #ffffff;
-  border: 1px solid rgba(20, 83, 45, 0.08);
-  border-radius: 28px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
-  overflow: hidden;
-}
-
-.mapa-fauna {
-  flex: 1 1 auto;
-  min-height: 100%;
-  width: 100%;
-  z-index: 1;
+.banner-text-right {
+  max-width: 450px;
 }
 
 .catalog-section {
@@ -375,26 +321,29 @@ onMounted(() => {
   background: #ffffff;
   border: 1px solid rgba(20, 83, 45, 0.08);
   transition: transform 0.2s ease;
+  overflow: hidden;
 }
 
 .catalog-card:hover {
   transform: translateY(-4px);
 }
 
-.catalog-image-wrap {
+figure {
   height: 200px;
   width: 100%;
 }
 
 .catalog-image {
   object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
 
 .linha-limitada {
   display: -webkit-box;
   line-clamp: 3;
   -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;  
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -403,8 +352,13 @@ onMounted(() => {
   background-color: #2d6a4f;
 }
 
-.carousel-control-prev { left: -3.5rem; }
-.carousel-control-next { right: -3.5rem; }
+.carousel-control-prev {
+  left: -3.5rem;
+}
+
+.carousel-control-next {
+  right: -3.5rem;
+}
 
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
@@ -414,28 +368,23 @@ onMounted(() => {
 }
 
 @media (max-width: 1200px) {
-  .carousel-control-prev { left: -1.5rem; }
-  .carousel-control-next { right: -1.5rem; }
+  .carousel-control-prev {
+    left: -1.5rem;
+  }
+
+  .carousel-control-next {
+    right: -1.5rem;
+  }
 }
 
 @media (max-width: 767.98px) {
-  .mapa-fauna {
+  #mapa-fauna {
     height: 350px;
   }
 
   .section-title {
     font-size: 2rem;
   }
-}
-
-.hero-banner {
-  min-height: 400px; /* Garante que o container tenha altura para o align-items-end empurrar o texto para baixo */
-  background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
-  border-bottom: 8px solid #84cc16; /* Linha verde limão na parte inferior identica à foto */
-}
-
-.hero-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.1) 100%);
 }
 
 

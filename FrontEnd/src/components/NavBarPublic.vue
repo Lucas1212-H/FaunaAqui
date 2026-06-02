@@ -16,13 +16,13 @@
         
         <RouterLink class="navbar-brand d-flex align-items-center" to="/">
           <div class="logo-text fw-bold lh-1">
-            <img src="../assets/images/conviva.png" height="75px" max-height="75px" width="auto" alt="conviva">
+            <img src="../assets/images/logo_sf.png" height="75px" max-height="75px" width="auto" alt="conviva">
           </div>
         </RouterLink>
 
         <nav class="collapse navbar-collapse justify-content-center" id="navbarNav">
           <ul class="navbar-nav gap-3 fw-semibold">
-            <li class="nav-item"><RouterLink class="nav-link text-dark-custom" to="/">Inicio</RouterLink></li>
+            <li class="nav-item"><RouterLink class="nav-link text-dark-custom" to="/">Home</RouterLink></li>
             <li class="nav-item"><RouterLink class="nav-link text-dark-custom" to="/sobre">Quem Somos</RouterLink></li>
             <li class="nav-item"><RouterLink class="nav-link text-dark-custom" to="/blog">Blog</RouterLink></li>
             <li class="nav-item"><RouterLink class="nav-link text-dark-custom" to="/contato">Contato</RouterLink></li>
@@ -83,13 +83,6 @@ const fazerLogout = () => {
 .text-sans-serif {
   font-family: 'Inter', 'Montserrat', sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-.navibar {
-  position: sticky;
-  top: 0;
-  z-index: 1030;
-  width: 100%;
 }
 
 /* Cores Customizadas */
