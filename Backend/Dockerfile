@@ -3,8 +3,8 @@
 FROM composer:2 AS builder
 WORKDIR /app
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 COPY . /app
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 # Runtime: PHP with extensions
 FROM php:8.1-cli
@@ -31,5 +31,5 @@ ENV PORT=8080
 
 EXPOSE 8080
 
-# On startup: try migrations (non-blocking), cache configs and start artisan server
-CMD php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisord.conf
+# Render-friendly startup: cache (best effort), migrate (best effort), then serve on PORT
+CMD ["sh","-lc","php artisan config:cache || true && php artisan route:cache || true && php artisan view:cache || true && php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=${PORT}"]
