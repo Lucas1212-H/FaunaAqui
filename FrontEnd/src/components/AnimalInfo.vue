@@ -97,6 +97,13 @@ import axios from 'axios';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Configura a URL base da API dinamicamente baseado no ambiente
+const API_BASE_URL = isLocal 
+  ? 'http://localhost:8000' 
+  : 'https://conviva-labev.onrender.com';
+
 export default {
   components: {
     NavBar
@@ -145,7 +152,7 @@ export default {
           this.erro = null;
           const id_especie = this.$route.params.id;
           // Requisição Axios para a API do Laravel
-          const response = await axios.get(`http://localhost:8000/api/especies/${id_especie}`);
+          const response = await axios.get(`${API_BASE_URL}/api/especies/${id_especie}`);
           // Injeta os dados retornados no nosso objeto local
           this.animal = response.data;
 
@@ -221,7 +228,7 @@ export default {
     },
     async editarInformacoes() {
       try {
-        const response = await axios.put(`http://localhost:8000/api/especies/${this.animal.id_especie}`, this.animal);
+        const response = await axios.put(`${API_BASE_URL}/api/especies/${this.animal.id_especie}`, this.animal);
         // Atualiza os dados locais com a resposta do servidor
         this.animal = response.data;
         alert('Informações atualizadas com sucesso!');

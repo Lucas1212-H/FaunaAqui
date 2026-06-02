@@ -158,10 +158,16 @@ type AnimalCatalogado = {
   descricao: string
   imagem: string
 }
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
 
 const router = useRouter()
-const API_BASE = 'http://localhost:8000/api'
-const STORAGE_BASE = 'http://localhost:8000/storage'
+const API_BASE = isLocal 
+  ? 'http://localhost:8000/api' 
+  : 'https://conviva-labev.onrender.com/api'
+
+const STORAGE_BASE = isLocal 
+  ? 'http://localhost:8000/storage' 
+  : 'https://conviva-labev.onrender.com/storage'
 const FALLBACK_IMAGE = 'https://cdn-icons-png.flaticon.com/512/616/616408.png'
 const MAX_ANIMAIS_CARROSSEL = 9
 

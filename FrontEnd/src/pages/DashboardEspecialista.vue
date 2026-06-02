@@ -79,15 +79,23 @@ import PainelAnalise from '@/components/especialista/PainelAnalise.vue';
 import ModalValidacao from '@/components/especialista/ModalValidacao.vue';
 import axios from 'axios';
 
+// Identifica se está rodando localmente ou no Render
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Configura a URL base da API dinamicamente baseado no ambiente
+const API_BASE_URL = isLocal 
+  ? 'http://localhost:8000' 
+  : 'https://conviva-labev.onrender.com';
+
 const selectedDenuncia = ref(null);
 const carregando = ref(true);
-const denuncias = ref([]) // array vazio para recebr o banco
+const denuncias = ref([]) // array vazio para receber o banco
 
 // Função assincrona para buscar as denuncias no banco
 const buscarOcorrenciasPendentes = async () => {
   try {
     carregando.value = true;
-    const response = await axios.get('http://localhost:8000/api/ocorrencias/pendentes');
+    const response = await axios.get(`${API_BASE_URL}/api/ocorrencias/pendentes`);
     denuncias.value = response.data; // preenche o array com os dados
   } catch (error) {
     console.error('Error ao conectar com a API:', error);
@@ -108,7 +116,7 @@ const handleValidar = (denuncia) => {
 
 const processarAprovacao = async (denuncia, aprovado) => {
   try {
-    await axios.put(`http://localhost:8000/api/ocorrencias/${denuncia.id}/validar`, { aprovado });
+    await axios.put(`${API_BASE_URL}/api/ocorrencias/${denuncia.id}/validar`, { aprovado });
 
     alert('Ocorrência avaliada com sucesso!');
     selectedDenuncia.value = null;

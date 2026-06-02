@@ -68,6 +68,13 @@
 import NavBar from '@/components/NavBar.vue'
 import axios from 'axios'
 
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Configura a URL base da API dinamicamente baseado no ambiente
+const API_BASE_URL = isLocal 
+  ? 'http://localhost:8000' 
+  : 'https://conviva-labev.onrender.com';
+
 export default {
   components: {
     NavBar
@@ -96,7 +103,7 @@ export default {
     async buscarOcorrenciasPublicadas() {
       try {
         this.carregandoOcorrencias = true;
-        const response = await axios.get('http://localhost:8000/api/ocorrencias/publicados');
+        const response = await axios.get(`${API_BASE_URL}/api/ocorrencias/publicados`);
         this.ocorrenciasPublicadas = response.data || [];
       } catch (error) {
         console.error('Erro ao buscar ocorrências publicadas:', error);
@@ -116,14 +123,14 @@ export default {
         formData.append('descricao', this.especie.descricao || '');
         formData.append('id_categoria', this.especie.id_categoria);
 
-        const responseEspecie = await axios.post('http://localhost:8000/api/especies', formData, {
+        const responseEspecie = await axios.post(`${API_BASE_URL}/api/especies`, formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
 
         const novaEspecieId = responseEspecie.data.id_especie || responseEspecie.data.id;
 
         if (this.ocorrenciasSelecionadas.length > 0) {
-          await axios.post(`http://localhost:8000/api/especies/${novaEspecieId}/vincular-ocorrencias`, {
+          await axios.post(`${API_BASE_URL}/api/especies/${novaEspecieId}/vincular-ocorrencias`, {
             ocorrencias_ids: this.ocorrenciasSelecionadas
           });
         }

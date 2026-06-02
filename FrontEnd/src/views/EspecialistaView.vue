@@ -78,7 +78,10 @@ const denunciasTriagem = ref([]);
 const denunciasArquivadas = ref([]);
 const publicadosLista = ref([]);
 
-const API_BASE = 'http://localhost:8000/api/ocorrencias';
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+
+const API_BASE = isLocal ? 'http://localhost:8000/api/ocorrencias' : 'https://conviva-labev.onrender.com/api/ocorrencias';
+const STORAGE_BASE = isLocal ? 'http://localhost:8000/storage' : 'https://conviva-labev.onrender.com/storage';
 
 const buscarDadosDoBanco = async () => {
   try {
@@ -96,7 +99,7 @@ const buscarDadosDoBanco = async () => {
       denunciante: item.denunciante_nome,
       tipo: item.distincao_biologica,
       descricao: item.descricao,
-      imagem: item.foto_path ? `http://localhost:8000/storage/${item.foto_path}` : 'https://picsum.photos/seed/fauna/640/360',
+      imagem: item.foto_path ? `${STORAGE_BASE}/${item.foto_path}` : 'https://picsum.photos/seed/fauna/640/360',
       local: item.ponto_referencia,
       data: new Date(item.created_at).toLocaleDateString('pt-BR'),
       status: item.situacao_animal,
@@ -109,7 +112,7 @@ const buscarDadosDoBanco = async () => {
       animal: item.tipo_animal,
       denunciante: item.denunciante_nome,
       distincaoBiologica: item.distincao_biologica,
-      imagem: item.foto_path ? `http://localhost:8000/storage/${item.foto_path}` : 'https://picsum.photos/seed/fauna/640/360',
+      imagem: item.foto_path ? `${STORAGE_BASE}/${item.foto_path}` : 'https://picsum.photos/seed/fauna/640/360',
       local: item.ponto_referencia,
       data: new Date(item.created_at).toLocaleDateString('pt-BR'),
       statusFinal: item.status,

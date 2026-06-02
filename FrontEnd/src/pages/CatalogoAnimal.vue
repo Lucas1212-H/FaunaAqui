@@ -184,6 +184,13 @@ import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+// Configura a URL base da API dinamicamente baseado no ambiente
+const API_BASE_URL = isLocal 
+  ? 'http://localhost:8000' 
+  : 'https://conviva-labev.onrender.com';
+
 export default {
   components: {
     NavBar
@@ -222,7 +229,7 @@ export default {
   methods: {
     async buscarDadosDoCatalogo() {
       try {
-        const response = await axios.get('http://localhost:8000/api/categorias');
+        const response = await axios.get(`${API_BASE_URL}/api/categorias`);
         this.listaCategorias = response.data;
       } catch (error) {
         console.error('Erro ao conectar com a API:', error);
@@ -232,7 +239,7 @@ export default {
     async selecionarCategoria(categoria) {
       try {
         // Busca a categoria com suas espécies
-        const response = await axios.get(`http://localhost:8000/api/categorias/${categoria.id_categoria || categoria.id}`);
+        const response = await axios.get(`${API_BASE_URL}/api/categorias/${categoria.id_categoria || categoria.id}`);
         let dados = response.data;
         
         // Se a resposta for um array, pega o primeiro elemento
@@ -278,7 +285,7 @@ export default {
           formData.append('foto', this.formCategoria.foto);
         }
         
-        await axios.post('http://localhost:8000/api/categorias', formData, {
+        await axios.post(`${API_BASE_URL}/api/categorias`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -325,7 +332,7 @@ export default {
           formData.append('foto', this.formEspecie.foto);
         }
         
-        const responseCriacao = await axios.post('http://localhost:8000/api/especies', formData, {
+        const responseCriacao = await axios.post(`${API_BASE_URL}/api/especies`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -334,7 +341,7 @@ export default {
         const novaEspecieId = responseCriacao.data?.id_especie || responseCriacao.data?.id;
 
         if (novaEspecieId && this.ocorrenciasSelecionadas.length > 0) {
-          await axios.post(`http://localhost:8000/api/especies/${novaEspecieId}/vincular-ocorrencias`, {
+          await axios.post(`${API_BASE_URL}/api/especies/${novaEspecieId}/vincular-ocorrencias`, {
             ocorrencias_ids: this.ocorrenciasSelecionadas
           });
         }
@@ -345,7 +352,7 @@ export default {
         this.modalNovaEspecie = false;
         
         // Recarregar categoria com suas espécies
-        const response = await axios.get(`http://localhost:8000/api/categorias/${categoriaId}`);
+        const response = await axios.get(`${API_BASE_URL}/api/categorias/${categoriaId}`);
         const dados = response.data;
         if (!dados.especies) {
           dados.especies = [];
@@ -370,7 +377,7 @@ export default {
     async buscarOcorrenciasPublicadas() {
       try {
         this.carregandoOcorrencias = true;
-        const response = await axios.get('http://localhost:8000/api/ocorrencias/publicados');
+        const response = await axios.get(`${API_BASE_URL}/api/ocorrencias/publicados`);
         this.ocorrenciasPublicadas = response.data || [];
       } catch (error) {
         console.error('Erro ao carregar ocorrências publicadas:', error);
