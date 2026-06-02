@@ -2,10 +2,10 @@ import axios from 'axios'
 
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
-// URL base dinâmica
+// URL base dinâmica CORRIGIDA (Adicionado /api no final de ambas)
 const API_BASE_URL = isLocal 
-  ? 'http://localhost:8000' 
-  : 'https://conviva-labev.onrender.com';
+  ? 'http://localhost:8000/api' 
+  : 'https://conviva-labev.onrender.com/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -53,6 +53,7 @@ export const ocorrenciaService = {
     formData.append('foto', dados.foto)
 
     try {
+      // Como o baseURL já termina em /api, isso vai para /api/ocorrencias
       const response = await api.post('/ocorrencias', formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
@@ -74,6 +75,7 @@ export const ocorrenciaService = {
    */
   async obterDenunciaPorId(id: number | string) {
     try {
+      // Isso vai para /api/ocorrencias/{id}
       const response = await api.get(`/ocorrencias/${id}`)
       return response.data
     } catch (error) {
