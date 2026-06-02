@@ -32,4 +32,4 @@ ENV PORT=8080
 EXPOSE 8080
 
 # On startup: try migrations (non-blocking), cache configs and start artisan server
-CMD ["sh","-lc","php artisan migrate --force || true && php artisan config:cache || true && php artisan route:cache || true && php artisan serve --host=0.0.0.0 --port=${PORT}"]
+CMD php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisord.conf
