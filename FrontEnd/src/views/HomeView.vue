@@ -168,6 +168,7 @@ const API_BASE = isLocal
 const STORAGE_BASE = isLocal 
   ? 'http://localhost:8000/storage' 
   : 'https://conviva-labev.onrender.com/storage'
+
 const FALLBACK_IMAGE = 'https://cdn-icons-png.flaticon.com/512/616/616408.png'
 const MAX_ANIMAIS_CARROSSEL = 9
 
@@ -216,17 +217,36 @@ const carregarAnimaisCatalogados = async () => {
 
     const response = await axios.get<EspecieApi[]>(`${API_BASE}/especies`)
 
-    animaisCatalogados.value = response.data.map((especie) => ({
-      id: especie.id_especie,
-      nome: normalizarTexto(especie.nome_popular) || 'Espécie sem nome popular',
-      nomeCientifico: normalizarTexto(especie.nome_cientifico) || 'Nome científico indisponível',
-      categoria:
-        normalizarTexto(especie.categoria?.nome_popular) ||
-        normalizarTexto(especie.categoria?.nome_cientifico) ||
-        'Categoria não informada',
-      descricao: normalizarTexto(especie.descricao) || 'Sem descrição cadastrada para esta espécie.',
-      imagem: especie.foto ? `${STORAGE_BASE}/${especie.foto}` : FALLBACK_IMAGE,
-    }))
+    animaisCatalogados.value = response.data.map((especie) => {
+      // 1. Limpa o nome da foto retornado pela API
+      const nomeFoto = normalizarTexto(especie.foto);
+      
+      // 2. Decide a URL com base no cenário correto
+      let urlImagem = FALLBACK_IMAGE;
+      if (nomeFoto) {
+        if (isLocal) {
+          // Localmente busca direto da pasta pública de desenvolvimento
+          urlImagem = `${STORAGE_BASE}/${nomeFoto}`;
+        } else {
+          // Em produção, passa pela rota do Laravel para injetar o CORS
+          // Se o nome no banco já contiver o prefixo "public/", removemos para a rota funcionar perfeitamente
+          const nomeLimpo = nomeFoto.replace(/^public\//, '');
+          urlImagem = `${STORAGE_BASE}/${nomeLimpo}`;
+        }
+      }
+
+      return {
+        id: especie.id_especie,
+        nome: normalizarTexto(especie.nome_popular) || 'Espécie sem nome popular',
+        nomeCientifico: normalizarTexto(especie.nome_cientifico) || 'Nome científico indisponível',
+        categoria:
+          normalizarTexto(especie.categoria?.nome_popular) ||
+          normalizarTexto(especie.categoria?.nome_cientifico) ||
+          'Categoria não informada',
+        descricao: normalizarTexto(especie.descricao) || 'Sem descrição cadastrada para esta espécie.',
+        imagem: urlImagem, // URL devidamente higienizada e livre do bloqueio ORB
+      };
+    })
   } catch (error) {
     console.error('Erro ao carregar animais catalogados:', error)
     erroAnimaisCatalogados.value = 'Não foi possível carregar os animais catalogados no momento.'

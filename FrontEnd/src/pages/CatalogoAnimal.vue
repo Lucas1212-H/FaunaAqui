@@ -21,10 +21,10 @@
             >
               <figure class="m-0">
                 <img 
-                  :src="cat.foto ? `http://localhost:8000/storage/${cat.foto}` : 'https://cdn-icons-png.flaticon.com/512/616/616408.png'" 
+                  :src="obterImagemUrlTratada(cat)" 
                   :alt="cat.nome_popular"
-                  class="img-fluid mb-2" 
-                  style="max-height: 80px;"
+                  class="img-fluid mb-2 object-fit-cover" 
+                  style="max-height: 80px; min-height: 80px; width: auto;"
                 >
                 <figcaption class="h5 fw-bold text-dark m-0">{{ cat.nome_popular }}</figcaption>
                 <small class="text-muted fst-italic">{{ cat.nome_cientifico }}</small>
@@ -52,7 +52,7 @@
           <div class="col" v-for="especie in (categoriaSelecionada?.especies || [])" :key="especie.id_especie">
             <article class="card h-100 shadow-sm border-0 overflow-hidden rounded-3" style="cursor: pointer;" @click="IrParaDetalhes(especie.id_especie)">
               <img 
-                :src="especie.foto ? `http://localhost:8000/storage/${especie.foto}` : 'https://picsum.photos/seed/fauna/300/200'" 
+                :src="obterImagemUrlTratada(especie)" 
                 :alt="especie.nome_popular" 
                 class="card-img-top object-fit-cover"
                 style="height: 180px;"
@@ -73,7 +73,6 @@
 
     </main>
 
-    <!-- Modal Nova Categoria -->
     <div class="modal" :class="{ show: modalNovaCategoria }" :style="{ display: modalNovaCategoria ? 'block' : 'none' }" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -104,7 +103,6 @@
       </div>
     </div>
 
-    <!-- Modal Nova Espécie -->
     <div class="modal" :class="{ show: modalNovaEspecie }" :style="{ display: modalNovaEspecie ? 'block' : 'none' }" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -173,7 +171,6 @@
       </div>
     </div>
 
-    <!-- Backdrop -->
     <div class="modal-backdrop fade" :class="{ show: modalNovaCategoria || modalNovaEspecie }" v-if="modalNovaCategoria || modalNovaEspecie"></div>
   </div>
 </template>
@@ -197,22 +194,13 @@ export default {
   },
   data() {
     return {
-      // Estado que dita qual tela está ativa (null = Categorias, objeto preenchido = Espécies)
       categoriaSelecionada: null,
-      
-      // Recebe o JSON completo estruturado com suas espécies
       listaCategorias: [],
-      
-      // Modais
       modalNovaCategoria: false,
       modalNovaEspecie: false,
-
-      // Ocorrências publicadas para vincular na criação de espécie
       carregandoOcorrencias: false,
       ocorrenciasPublicadas: [],
       ocorrenciasSelecionadas: [],
-      
-      // Formulários
       formCategoria: {
         nome_cientifico: '',
         nome_popular: '',
@@ -227,6 +215,27 @@ export default {
     }
   },
   methods: {
+    // CORRIGIDO: Método movido para dentro do escopo de methods e adaptado para ler qualquer modelo (categoria ou espécie)
+    obterImagemUrlTratada(item) {
+      const fallback = 'https://picsum.photos/seed/fauna/300/200';
+      if (!item) return fallback;
+      
+      const nomeArquivo = item.foto || item.imagem;
+      if (!nomeArquivo) return fallback;
+      
+      if (nomeArquivo.startsWith('http')) return nomeArquivo;
+      
+      // Limpa prefixos duplicados do Laravel se existirem no retorno do banco
+      const nomeLimpo = nomeArquivo.replace(/^public\//, '');
+      
+      if (isLocal) {
+        return `${API_BASE_URL}/storage/${nomeLimpo}`;
+      }
+      
+      // Em produção, passa pela rota de escape da API para contornar o bloqueio de CORS (ORB)
+      return `${API_BASE_URL}/api/imagens/${nomeLimpo}`;
+    },
+
     async buscarDadosDoCatalogo() {
       try {
         const response = await axios.get(`${API_BASE_URL}/api/categorias`);
@@ -238,16 +247,13 @@ export default {
     
     async selecionarCategoria(categoria) {
       try {
-        // Busca a categoria com suas espécies
         const response = await axios.get(`${API_BASE_URL}/api/categorias/${categoria.id_categoria || categoria.id}`);
         let dados = response.data;
         
-        // Se a resposta for um array, pega o primeiro elemento
         if (Array.isArray(dados)) {
           dados = dados[0] || {};
         }
         
-        // Garante que sempre há um array de espécies, mesmo que vazio
         if (!dados.especies) {
           dados.especies = [];
         }
@@ -255,7 +261,6 @@ export default {
         this.categoriaSelecionada = dados;
       } catch (error) {
         console.error('Erro ao carregar espécies:', error);
-        // Mesmo com erro, entra na categoria com espécies vazias
         this.categoriaSelecionada = {
           ...categoria,
           especies: []
@@ -291,11 +296,9 @@ export default {
           }
         });
         
-        // Limpar formulário e fechar modal
         this.formCategoria = { nome_cientifico: '', nome_popular: '', foto: null };
         this.modalNovaCategoria = false;
         
-        // Recarregar dados
         await this.buscarDadosDoCatalogo();
         alert('Categoria criada com sucesso!');
       } catch (error) {
@@ -346,12 +349,10 @@ export default {
           });
         }
         
-        // Limpar formulário e fechar modal
         this.formEspecie = { nome_cientifico: '', nome_popular: '', foto: null, descricao: '' };
         this.ocorrenciasSelecionadas = [];
         this.modalNovaEspecie = false;
         
-        // Recarregar categoria com suas espécies
         const response = await axios.get(`${API_BASE_URL}/api/categorias/${categoriaId}`);
         const dados = response.data;
         if (!dados.especies) {
@@ -387,7 +388,6 @@ export default {
       }
     },
     IrParaDetalhes(id_especie) {
-      // Navega para a rota de detalhe do catálogo (AnimalInfo)
       this.$router.push({ name: 'catalogo-detalhe', params: { id: id_especie } });
     }
   },
@@ -406,7 +406,6 @@ export default {
 </script>
 
 <style scoped>
-/* Estilos mínimos mantidos apenas para caprichar na apresentação dos cards */
 .card {
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -414,13 +413,10 @@ export default {
   transform: translateY(-4px);
   box-shadow: 0 8px 15px rgba(0,0,0,0.08) !important;
 }
-
-/* Modal styles */
 .modal.show {
   display: block !important;
   background-color: rgba(0, 0, 0, 0.5);
 }
-
 .modal-backdrop {
   position: fixed;
   top: 0;
@@ -430,7 +426,6 @@ export default {
   height: 100vh;
   background-color: #000;
 }
-
 .modal-backdrop.show {
   opacity: 0.5;
 }

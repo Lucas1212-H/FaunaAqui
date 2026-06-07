@@ -12,7 +12,7 @@
         <div class="row g-4">
           <div class="col-lg-6">
             <img
-              :src="denuncia.imagem || 'https://picsum.photos/640/420'"
+              :src="getImagemUrl(denuncia)"
               class="img-fluid rounded-3 border"
               alt="Foto da denúncia"
             >
@@ -128,6 +128,19 @@ const getStatusClass = (status) => {
   if (status === 'Preso') return 'status-info'
   return 'status-default'
 }
+
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
+const STORAGE_BASE = isLocal 
+  ? 'http://localhost:8000/storage/' 
+  : 'https://conviva-labev.onrender.com/storage/';
+
+const getImagemUrl = (denuncia) => {
+  if (!denuncia || !denuncia.imagem) return 'https://picsum.photos/640/420';
+  const nomeArquivo = denuncia.foto || denuncia.imagem;
+  if(!nomeArquivo) return 'https://picsum.photos/640/420';
+  if (nomeArquivo.startWith('http')) return nomeArquivo; // já é uma URL completa
+  return `${STORAGE_BASE}/${nomeArquivo}`;
 </script>
 
 <style scoped>

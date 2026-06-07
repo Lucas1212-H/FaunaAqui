@@ -26,3 +26,23 @@ Route::put('/especies/{id}', [EspecieController::class, 'update']);
 Route::delete('/especies/{id}', [EspecieController::class, 'destroy']);
 
 Route::post('/especies/{id}/vincular-ocorrencias', [EspecieController::class, 'vincularOcorrencias']);
+
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Response;
+
+Route::get('/imagens/{filename}', function ($filename) {
+    $path = storage_path('app/public/imagens/' . $filename);
+
+    if (!file_exists($path)) {
+        return response()->json(['error' => 'Imagem não encontrada.'], 404);
+    }
+
+    $file = Storage::get($path);
+    $type = Storage::mimeType($path);
+
+    return response::make($file, 200, [
+        'Content-Type' => $type,
+        'Access-control-allow-origin' => '*',
+        'Access-control-allow-methods' => 'GET',
+    ]);
+});
