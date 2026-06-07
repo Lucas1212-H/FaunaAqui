@@ -141,6 +141,7 @@ const getImagemUrl = (denuncia) => {
   if(!nomeArquivo) return 'https://picsum.photos/640/420';
   if (nomeArquivo.startWith('http')) return nomeArquivo; // já é uma URL completa
   return `${STORAGE_BASE}/${nomeArquivo}`;
+};
 </script>
 
 <style scoped>
