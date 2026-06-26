@@ -12,6 +12,7 @@
         <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'triagem' }" @click="selecionarAba('triagem')">Início</button>
         <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'arquivadas' }" @click="selecionarAba('arquivadas')">Denuncias Arquivadas</button>
         <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'publicados' }" @click="selecionarAba('publicados')">Publicados</button>
+        <button type="button" class="nav-item-link nav-button" :class="{ active: abaAtiva === 'postagens'}" @click="selecionarAba('postagens')">Postagens</button>
       </div>
     </div>
 
@@ -22,6 +23,7 @@
       <div class="dropdown">
         <button 
           class="avatar-circle shadow-sm dropdown-toggle" 
+          :style="{ backgroundColor: avatarColor }"
           type="button" 
           id="userDropdown" 
           data-bs-toggle="dropdown" 
@@ -31,13 +33,13 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
           <li>
-            <RouterLink class="dropdown-item" :to="{ name: 'editar-perfil' }">✏️ Editar Perfil</RouterLink>
+            <RouterLink class="dropdown-item" :to="{ name: 'editar-perfil' }">Editar Perfil</RouterLink>
           </li>
           <li v-if="isAdmin">
-            <RouterLink class="dropdown-item text-warning fw-semibold" :to="{ name: 'aprovar-usuario' }">🛡️ Gerenciar Usuários</RouterLink>
+            <RouterLink class="dropdown-item text-warning fw-semibold" :to="{ name: 'aprovar-usuario' }">Gerenciar Usuários</RouterLink>
           </li>
           <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item text-danger" href="#" @click.prevent="fazerLogout">🚪 Sair</a></li>
+          <li><a class="dropdown-item text-danger" href="#" @click.prevent="fazerLogout">Sair</a></li>
         </ul>
       </div>
     </div>
@@ -45,7 +47,7 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
@@ -61,11 +63,30 @@ const emit = defineEmits(['mudarAba'])
 const router = useRouter()
 const { usuarioLogado, logout } = useAuth()
 
+const avatarColor = ref('#ffffff')
+
+onMounted(() => {
+  let storedColor = localStorage.getItem('avatar_color')
+  if (!storedColor) {
+    const pastelColors = ['#FFD1DC', '#AEC6CF', '#B5EAD7', '#E0BBE4']
+    storedColor = pastelColors[Math.floor(Math.random() * pastelColors.length)]
+    localStorage.setItem('avatar_color', storedColor)
+  }
+  avatarColor.value = storedColor
+})
+
 const isAdmin = computed(() => {
   return localStorage.getItem('user_tipo') === 'Administrador'
 })
 
 const selecionarAba = (aba) => {
+  if (aba === 'postagens') {
+    // Redireciona diretamente para a rota do painel de postagens
+    // Certifique-se de que o nome da rota no seu router/index.ts é idêntico a este
+    router.push({ name: 'gerenciar-posts' }) 
+    return
+  }
+
   if (props.abaAtiva !== undefined) {
     emit('mudarAba', aba)
     return
@@ -74,8 +95,9 @@ const selecionarAba = (aba) => {
   router.push({ name: 'specialist-area', query: { aba } })
 }
 
+
 const inicialNome = computed(() => {
-  const nome = usuarioLogado.value?.nome || 'U'
+  const nome = usuarioLogado.value?.name || usuarioLogado.value?.nome || localStorage.getItem('user_name') || 'U'
   return nome.charAt(0).toUpperCase()
 })
 

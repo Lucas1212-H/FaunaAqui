@@ -56,7 +56,7 @@
                 <RouterLink to="/cadastro" class="text-decoration-none text-primary fw-bold">Criar Conta</RouterLink>
               </div>
               <div class="text-center mt-2">
-                <a href="#" class="text-decoration-none text-dark opacity-75 small">Esqueci minha senha</a>
+                <RouterLink to="/esqueci-senha" class="text-decoration-none text-dark opacity-75 small">Esqueci minha senha</RouterLink>
               </div>
             </form>
           </div>

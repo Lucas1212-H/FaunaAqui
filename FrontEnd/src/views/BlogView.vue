@@ -1,101 +1,186 @@
 <template>
-  <div class="Blog-Page">    
+  <div class="noticias-page bg-light text-dark text-sans-serif">
     <NavBarPublic />
-      
-    <section class="hero-banner position-relative d-flex align-items-end">
+
+    <header class="hero-banner position-relative d-flex align-items-center justify-content-start text-start">
       <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
       
-      <div class="container-fluid px-5 pb-5 position-relative z-index-2 text-white">
-        <nav aria-label="breadcrumb" class="mb-2">
-          <ol class="breadcrumb tiny-text tracking-wider text-uppercase text-white-50 m-0">
-            <li class="breadcrumb-item"><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
-            <li class="breadcrumb-item active text-white" aria-current="page">Blog</li>
-          </ol>
-        </nav>
-        
-        <h1 class="display-4 fw-bold m-0 hero-title">Blog</h1>
+      <div class="container position-relative z-index-2 text-white px-4 px-md-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-4 w-100">
+          <div>
+            <nav aria-label="breadcrumb" class="mb-3">
+              <ol class="breadcrumb tiny-text tracking-widest text-uppercase m-0">
+                <li class="breadcrumb-item">
+                  <RouterLink class="text-white-50 text-decoration-none" to="/">Início</RouterLink>
+                </li>
+                <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Notícias</li>
+              </ol>
+            </nav>
+            <span class="text-uppercase tracking-widest fw-bold text-success-light mb-1 d-inline-block small">Comunicação e Mídia</span>
+            <h1 class="display-3 fw-extrabold m-0 text-uppercase tracking-tight hero-title">Central de Conteúdo</h1>
+          </div>
+
+          <aside class="banner-text-right" style="max-width: 400px;">
+            <p class="fs-5 fw-light lh-lg m-0">
+              Fique por dentro de notícias, artigos científicos, conferências e comunicados oficiais do ecossistema <strong>ConViva</strong>.
+            </p>
+          </aside>
+        </div>
       </div>
-    </section>
+    </header>
 
-    <!-- Conteúdo da página -->
+    <main class="container my-5">
+      
+      <nav class="d-flex justify-content-center gap-2 mb-5 flex-wrap" aria-label="Filtro de publicações">
+        <button 
+          v-for="aba in ['Todos', 'Noticia', 'Conferencia', 'Anuncio']" 
+          :key="aba"
+          class="btn btn-filter text-uppercase fw-bold px-4 py-2 rounded-0 text-sans-serif"
+          :class="filtroAtivo === aba ? 'btn-dark' : 'btn-outline-dark'"
+          @click="filtroAtivo = aba"
+        >
+          {{ labelFiltro(aba) }}
+        </button>
+      </nav>
 
+      <section v-if="carregando" class="text-center my-5 py-5">
+        <div class="spinner-border text-dark rounded-0" role="status"></div>
+        <p class="text-muted small text-uppercase tracking-widest mt-3">Sincronizando publicações...</p>
+      </section>
 
-    <h4 class="text-center fw-bold mt-5 mb-4">Aqui será é um espaço para publicações</h4>
+      <section v-else-if="postsFiltrados.length === 0" class="text-center my-5 p-5 border bg-white text-muted text-uppercase small tracking-wider rounded-0 shadow-sm">
+        Nenhuma publicação disponível nesta categoria no momento.
+      </section>
+
+      <section v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-2 g-4 text-start">
+        <article 
+          class="col" 
+          v-for="post in postsFiltrados" 
+          :key="post.id" 
+          @click="$router.push(`/noticias/${post.id}`)" 
+          style="cursor: pointer;"
+        >
+          <div class="card h-100 border rounded-0 shadow-sm position-relative overflow-hidden card-post-link bg-white">
+            
+            <span class="badge position-absolute top-0 end-0 m-3 px-3 py-2 rounded-0 text-uppercase tracking-widest shadow-sm border" :class="corBadge(post.tipo)">
+              {{ labelFiltro(post.tipo) }}
+            </span>
+
+            <img 
+              :src="post.imagem_url || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=600&q=80'" 
+              class="card-img-top rounded-0 border-bottom" 
+              style="height: 240px; object-fit: cover;"
+              alt="Capa da publicação"
+            />
+
+            <div class="card-body d-flex flex-column p-4">
+              <h2 class="card-title h4 fw-bold text-dark text-truncate-2 mb-3 lh-base">{{ post.titulo }}</h2>
+              
+              <p class="card-text text-secondary small text-truncate-4 flex-grow-1 mb-4 lh-lg">
+                {{ post.conteudo }}
+              </p>
+              
+              <footer class="pt-2 border-top d-flex justify-content-between align-items-center mt-auto">
+                <div class="text-muted small">
+                  Publicado em: <time :datetime="post.created_at" class="fw-semibold text-dark">{{ formatarData(post.created_at) }}</time>
+                </div>
+                <span class="text-uppercase fw-bold text-success-light tracking-wider small link-fake">Ler Artigo →</span>
+              </footer>
+            </div>
+          </div>
+        </article>
+      </section>
+    </main>
 
     <Footer />
   </div>
 </template>
 
 <script setup>
-import { reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
+import axios from 'axios'
 import NavBarPublic from '@/components/NavBarPublic.vue'
 import Footer from '@/components/Footer.vue'
 
-const form = reactive({
-  nome: '',
-  email: '',
-  mensagem: ''
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const API_BASE_URL = isLocal ? 'http://localhost:8000' : 'https://conviva-labev.onrender.com'
+const posts = ref([])
+const carregando = ref(true)
+const filtroAtivo = ref('Todos')
+
+const buscarPosts = async () => {
+  try {
+    carregando.value = true
+    const response = await axios.get(`${API_BASE_URL}/api/posts`)
+    
+    if (Array.isArray(response.data)) {
+      posts.value = response.data
+    } else if (response.data && Array.isArray(response.data.data)) {
+      posts.value = response.data.data
+    } else {
+      posts.value = []
+    } 
+  } catch (error) {
+      console.error('Erro ao buscar publicações:', error)
+      posts.value = []
+    } finally {
+      carregando.value = false
+    }
+}
+
+const postsFiltrados = computed(() => {
+  if (filtroAtivo.value === 'Todos') return posts.value
+  return posts.value.filter(post => post.tipo === filtroAtivo.value)
 })
 
-const handleSubmit = () => {
-  alert(`Mensagem enviada!\nNome: ${form.nome}\nEmail: ${form.email}`)
-  form.nome = ''
-  form.email = ''
-  form.mensagem = ''
+const labelFiltro = (tipo) => {
+  const labels = {
+    'Todos': 'Ver Tudo',
+    'Noticia': 'Notícias',
+    'Conferencia': 'Conferências',
+    'Anuncio': 'Anúncios'
+  }
+  return labels[tipo] || tipo
 }
+
+const corBadge = (tipo) => {
+  if (tipo === 'Noticia') return 'bg-success text-white border-success'
+  if (tipo === 'Conferencia') return 'bg-warning text-dark border-warning'
+  return 'bg-dark text-white border-dark'
+}
+
+const formatarData = (dataString) => {
+  if (!dataString) return '-'
+  const data = new Date(dataString)
+  return data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+onMounted(() => {
+  buscarPosts()
+})
 </script>
 
 <style scoped>
-/* --- CONFIGURAÇÕES DE PALETA E TIPOGRAFIA --- */
+.rounded-0 { border-radius: 0px !important; }
+.fw-extrabold { font-weight: 800; }
+.tracking-widest { letter-spacing: 0.15em; }
+.tracking-wider { letter-spacing: 0.08em; }
+.tracking-tight { letter-spacing: -0.02em; }
+.text-success-light { color: #58d68d; }
+
 .text-sans-serif {
-  font-family: 'Inter', 'Montserrat', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Cores Customizadas */
-.top-bar {
-  background-color: #1f6b6d; /* Verde Petróleo Escuro */
-}
-.text-petroleo { color: #1f6b6d; }
-.text-oliva { color: #556b2f; }      /* Verde Oliva Corporativo */
-.text-laranja-oliva { color: #d4a373; } /* Tom terroso secundário */
-.text-dark-custom { color: #333333; }
-
-/* Menu Ativo */
-.active-green {
-  color: #70a1ff !important; /* Ajuste para a cor ativa destacada */
-  color: #7ba986 !important; /* Exemplo de verde claro institucional ativo */
-}
-
-/* Ajustes de Fontes Finas/Especiais */
-.tiny-text {
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-.tracking-wide { letter-spacing: 0.1em; }
-.tracking-wider { letter-spacing: 0.15em; }
-.tracking-widest { letter-spacing: 0.2em; }
-.tracking-tight { letter-spacing: -0.05em; }
-
-.phone-number {
-  font-size: 0.95rem;
-  color: #212529;
-}
-
-/* --- BANNER HERO --- */
 .hero-banner {
-  height: 420px; /* Layout Horizontal Widescreen */
-  /* Substitua pelo caminho real da imagem da muda/solo */
-  background-image: url('../assets/images/banner_macaco.jpg');
-  background-size: cover;
-  background-position: center 60%;
-  position: relative;
-  /* Linha inferior de acabamento ecológico */
-  border-bottom: 6px solid #9ef01a; 
+  min-height: 400px;
+  background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
 }
 
 .hero-overlay {
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.5) 100%);
   z-index: 1;
 }
 
@@ -103,58 +188,54 @@ const handleSubmit = () => {
   z-index: 2;
 }
 
-.hero-title {
-  font-size: 3.5rem;
-  letter-spacing: -0.02em;
+.btn-filter {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  transition: all 0.2s ease;
+  border-width: 1px;
 }
 
-/* Customização leve do Breadcrumb para aceitar setas separadoras brancas */
+.card-post-link {
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.card-post-link:hover {
+  transform: translateY(-4px);
+  border-color: #1f2937 !important;
+}
+
+.link-fake {
+  font-size: 0.85rem;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
+.text-truncate-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;  
+  overflow: hidden;
+}
+
 .breadcrumb-item + .breadcrumb-item::before {
-  content: ">" !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  content: "→" !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.85rem;
+  padding: 0 8px;
 }
 
-/* Responsividade de Mídia */
-@media (max-width: 1200px) {
-  .hidden-md-down {
-    display: none !important;
-  }
+.tiny-text {
+  font-size: 0.75rem;
 }
 
-.contact-form-card {
-  max-width: 720px;
-  border: 1px solid rgba(34, 91, 56, 0.12);
-  background-color: #eef6ec;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
-}
-
-.contact-form-card h2 {
-  color: #214d30;
-}
-
-.contact-form-card p {
-  color: #4f6b55;
-}
-
-.contact-form-card .form-control {
-  border-radius: 12px;
-  border-color: rgba(34, 91, 56, 0.18);
-  background-color: #f8fbf7;
-}
-
-.contact-form-card .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(34, 91, 56, 0.15);
-}
-
-.contact-form-card button {
-  border-radius: 12px;
-  padding: 0.9rem 1.5rem;
-  background-color: #2f7a3d;
-  border-color: #2f7a3d;
-}
-
-.contact-form-card button:hover {
-  background-color: #245f30;
-  border-color: #245f30;
+@media (max-width: 991.98px) {
+  .hero-banner { min-height: 360px; }
+  .hero-banner .d-flex { flex-direction: column !important; align-items: flex-start !important; }
+  .banner-text-right { max-width: 100%; margin-top: 1rem; }
 }
 </style>

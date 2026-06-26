@@ -1,111 +1,209 @@
 <template>
-  <div class="home-page">
+  <div class="home-page bg-light text-dark">
     <NavBarPublic />
     
-    <header class="hero-banner position-relative d-flex align-items-end">
+    <header class="hero-banner position-relative d-flex align-items-center justify-content-start text-start">
       <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
-      <div class="container-fluid px-5 pb-5 position-relative z-index-2 text-white">
-        <h1 class="display-4 fw-bold m-0 hero-title">Home</h1>
+      <div class="container position-relative z-index-2 text-white px-4 px-md-5">
+        <div class="row align-items-center">
+          <div class="col-lg-7">
+            <span class="text-uppercase tracking-widest fw-bold text-success-light mb-2 d-inline-block small">Universidade Federal do Pará</span>
+            <h1 class="display-3 fw-extrabold m-0 text-uppercase lh-tight mb-3">ConViva <span class="fw-light text-lowercase text-capitalize">Labev</span></h1>
+            <p class="fs-4 fw-light lh-lg max-w-600 opacity-90">
+              Entre macacos, sapos, cobras e lagartos, <strong>salvam-se todos!</strong> Um projeto pioneiro de coexistência e conservação da fauna silvestre no campus universitário.
+            </p>
+          </div>
+        </div>
       </div>
-      <aside class="banner-text-right position-absolute end-0 top-50 translate-middle-y pe-5 text-white" style="max-width: 450px;">
-        <p class="fs-5 fw-light lh-lg">
-          Entre macacos, sapos, cobras e lagartos, SALVAM-SE TODOS! Projeto de coexistência e conservação de animais silvestres no campus da UFPA
-        </p>
-      </aside>
     </header>
 
-    <main class="container position-relative text-white">
-      <section class="row align-items-center">
-        <div class="col-lg-6 px-10">
-          <article class="hero-card shadow-lg">
-            <h2 class="display-10 fw-bold text-dark">Encontrou um animal silvestre na região?</h2>
-            <p class="lead text-dark">Ajude a ciência e a preservação local com apenas alguns cliques.</p>
-            <button @click="irParaDenuncia" class="btn btn-warning btn-lg fw-bold mt-3 px-5 py-3">Denuncie Aqui</button>
+    <main class="container my-5">
+      <section class="row g-4 align-items-stretch text-start mb-5">
+        <div class="col-lg-5 d-flex">
+          <article class="hero-card shadow-sm border p-4 p-md-5 w-100 d-flex flex-column justify-content-center bg-white rounded-0">
+            <h2 class="h1 fw-bold text-dark text-uppercase tracking-tight mb-3">Viu um animal silvestre no campus?</h2>
+            <p class="fs-5 text-secondary mb-4">Ajude a comunidade científica, monitore ocorrências e contribua com a preservação ambiental local com apenas alguns cliques.</p>
+            <div>
+              <button @click="irParaDenuncia" class="btn btn-dark btn-lg rounded-0 fw-bold text-uppercase tracking-wider px-5 py-3 w-100 w-sm-auto">
+                Registrar Avistamento
+              </button>
+            </div>
           </article>
         </div>
-        <div class="col-lg-6 p-5">
-          <div id="mapa-fauna" class="rounded-4 shadow-sm" style="height: 350px;"></div>
+        <div class="col-lg-7 d-flex">
+          <div class="w-100 border bg-white p-2 rounded-0 shadow-sm">
+            <div id="mapa-fauna" class="w-100 h-100" style="min-height: 400px;"></div>
+          </div>
         </div>
       </section>
-      <section class="py-5 catalog-section">
-        <div class="container position-relative px-md-5">
-          <h2 class="fw-bold mb-2 pb-3 text-center section-title">Animais Catalogados</h2>
-          
-          <template v-if="carregandoAnimaisCatalogados">
-            <div class="text-center py-5">
-              <div class="spinner-border text-success" role="status" aria-label="Carregando animais catalogados"></div>
-              <p class="text-muted mt-3 mb-0">Carregando animais catalogados...</p>
-            </div>
-          </template>
 
-          <template v-else-if="erroAnimaisCatalogados">
-            <div class="alert alert-warning border-0 shadow-sm" role="alert">
-              {{ erroAnimaisCatalogados }}
-            </div>
-          </template>
+      <section class="py-5 border-top text-start">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+          <div>
+            <span class="text-success text-uppercase fw-bold small tracking-wider">Fique por dentro</span>
+            <h2 class="fw-extrabold text-uppercase m-0 tracking-tight text-dark">Últimas Notícias</h2>
+          </div>
+          <button @click="$router.push('/noticias')" class="btn btn-sm btn-outline-dark rounded-0 text-uppercase fw-bold">Ver Blog →</button>
+        </div>
 
-          <template v-else-if="animaisExibidos.length === 0">
-            <div class="alert alert-light border shadow-sm text-center py-4" role="status">
-              Nenhuma espécie catalogada.
-            </div>
-          </template>
+        <div v-if="carregandoNoticias" class="text-center py-4">
+          <div class="spinner-border text-dark rounded-0" role="status"></div>
+        </div>
 
-          <template v-else>
-            <div id="catalogoAnimaisCarousel" class="carousel slide catalog-carousel" data-bs-ride="carousel">
-              <div class="carousel-indicators">
-                <button
-                  v-for="(grupo, index) in animaisAgrupados"
-                  :key="index"
-                  type="button"
-                  data-bs-target="#catalogoAnimaisCarousel"
-                  :data-bs-slide-to="index"
-                  :class="{ active: index === 0 }"
-                  :aria-current="index === 0 ? 'true' : 'false'"
-                  :aria-label="`Slide ${index + 1}`"
-                ></button>
-              </div>
+        <div v-else-if="noticias.length === 0" class="alert alert-light border text-center py-4 rounded-0">
+          Nenhuma publicação disponível no momento.
+        </div>
 
-              <div class="carousel-inner">
-                <section
-                  v-for="(grupo, index) in animaisAgrupados"
-                  :key="index"
-                  class="carousel-item"
-                  :class="{ active: index === 0 }"
+        <div v-else id="noticiasCarousel" class="carousel slide" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div 
+              v-for="(grupo, idx) in noticiasAgrupadas" 
+              :key="idx" 
+              class="carousel-item" 
+              :class="{ active: idx === 0 }"
+            >
+              <div class="row g-4">
+                <article 
+                  v-for="post in grupo" 
+                  :key="post.id" 
+                  class="col-md-4"
+                  @click="$router.push(`/noticias/${post.id}`)"
+                  style="cursor: pointer;"
                 >
-                  <div class="row g-4 justify-content-center px-2">
-                    <article 
-                      v-for="animal in grupo" 
-                      :key="animal.id" 
-                      class="col-12 col-md-6 col-lg-4 catalog-card shadow-sm h-100"
-                    >
-                      <figure class="m-0 overflow-hidden rounded-top">
-                        <img :src="animal.imagem" :alt="animal.nome" class="catalog-image w-100 h-100" />
-                      </figure>
-                      <div class="p-4 d-flex flex-column justify-content-between h-100">
-                        <div>
-                          <span class="badge rounded-pill text-bg-success mb-2">{{ animal.categoria }}</span>
-                          <h3 class="h4 fw-bold mb-1 text-dark text-truncate">{{ animal.nome }}</h3>
-                          <p class="text-secondary small fst-italic mb-3 text-truncate">{{ animal.nomeCientifico }}</p>
-                          <p class="text-body-secondary small mb-0 linha-limitada">{{ animal.descricao }}</p>
-                        </div>
+                  <div class="card h-100 border rounded-0 shadow-sm card-noticia-hover bg-white">
+                    <img 
+                      :src="post.imagem_url || 'https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=600&q=80'" 
+                      class="card-img-top rounded-0 border-bottom" 
+                      style="height: 200px; object-fit: cover;"
+                      alt="Banner da notícia"
+                    />
+                    <div class="card-body p-4 d-flex flex-column justify-content-between">
+                      <div>
+                        <span class="badge rounded-0 text-uppercase mb-2" :class="post.tipo === 'Noticia' ? 'bg-success' : 'bg-secondary'">{{ post.tipo }}</span>
+                        <h3 class="h5 fw-bold text-dark lh-base text-limit-2 mb-2">{{ post.titulo }}</h3>
+                        <p class="text-secondary small text-limit-3 mb-0">{{ post.conteudo }}</p>
                       </div>
-                    </article>
+                    </div>
                   </div>
-                </section>
+                </article>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-3" v-if="noticiasAgrupadas.length > 1">
+            <button class="btn btn-dark btn-sm rounded-0" type="button" data-bs-target="#noticiasCarousel" data-bs-slide="prev">❮</button>
+            <button class="btn btn-dark btn-sm rounded-0" type="button" data-bs-target="#noticiasCarousel" data-bs-slide="next">❯</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-5 border-top">
+        <div class="text-center mb-4">
+          <span class="text-success text-uppercase fw-bold small tracking-wider">Biodiversidade</span>
+          <h2 class="fw-extrabold text-uppercase m-0 tracking-tight text-dark">Animais Catalogados</h2>
+        </div>
+        
+        <template v-if="carregandoAnimaisCatalogados">
+          <div class="text-center py-5">
+            <div class="spinner-border text-dark rounded-0" role="status"></div>
+          </div>
+        </template>
+
+        <template v-else-if="erroAnimaisCatalogados">
+          <div class="alert alert-warning border-0 shadow-sm rounded-0 text-start" role="alert">
+            {{ erroAnimaisCatalogados }}
+          </div>
+        </template>
+
+        <template v-else-if="animaisExibidos.length === 0">
+          <div class="alert alert-light border shadow-sm text-center py-4 rounded-0" role="status">
+            Nenhuma espécie catalogada no sistema.
+          </div>
+        </template>
+
+        <template v-else>
+          <div id="catalogoAnimaisCarousel" class="carousel slide text-start" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div
+                v-for="(grupo, index) in animaisAgrupados"
+                :key="index"
+                class="carousel-item"
+                :class="{ active: index === 0 }"
+              >
+                <div class="row g-4 justify-content-center">
+                  <article 
+                    v-for="animal in grupo" 
+                    :key="animal.id" 
+                    class="col-12 col-md-6 col-lg-4"
+                  >
+                    <div class="card h-100 border bg-white shadow-sm rounded-0 overflow-hidden">
+                      <figure class="m-0 border-bottom" style="height: 220px; width: 100%;">
+                        <img :src="animal.imagem" :alt="animal.nome" class="w-100 h-100" style="object-fit: cover;" />
+                      </figure>
+                      <div class="p-4">
+                        <span class="badge rounded-0 bg-success text-uppercase mb-2 small">{{ animal.categoria }}</span>
+                        <h3 class="h4 fw-bold mb-1 text-dark text-truncate">{{ animal.nome }}</h3>
+                        <p class="text-secondary small fst-italic mb-3 text-truncate">{{ animal.nomeCientifico }}</p>
+                        <p class="text-body-secondary small mb-0 text-limit-3">{{ animal.descricao }}</p>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-center gap-2 mt-4" v-if="animaisAgrupados.length > 1">
+              <button class="btn btn-outline-dark btn-sm rounded-0" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="prev">Anterior</button>
+              <button class="btn btn-outline-dark btn-sm rounded-0" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="next">Próximo</button>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <section class="py-5 border-top text-start">
+        <div class="row g-5 align-items-start">
+          <div class="col-lg-6">
+            <span class="text-success text-uppercase fw-bold small tracking-wider">Conheça o Laboratório</span>
+            <h2 class="fw-extrabold text-uppercase tracking-tight text-dark mb-4">O Projeto & O LABEV</h2>
+            <p class="fs-5 text-secondary lh-lg mb-4">
+              O <strong>Laboratório de Ecologia e Conservação de Vertebrados (LABEV)</strong> da Universidade Federal do Pará (UFPA) monitora e desenvolve estratégias científicas para garantir a sobrevivência e a livre circulação de espécies nativas que habitam e cruzam as áreas verdes da nossa instituição.
+            </p>
+            <p class="text-secondary lh-lg">
+              Com o aumento das infraestruturas urbanas, nosso trabalho foca em coletar dados em tempo real, catalogar espécimes e instruir a comunidade acadêmica sobre o manejo correto de encontros com animais silvestres, promovendo um ecossistema seguro e integrado.
+            </p>
+          </div>
+          
+          <div class="col-lg-6">
+            <div class="p-4 p-md-5 bg-white border rounded-0 shadow-sm">
+              <h3 class="h4 fw-bold text-dark text-uppercase tracking-wide mb-4 border-bottom pb-2">Equipe e Responsáveis</h3>
+              
+              <div class="d-flex align-items-start gap-3 mb-4">
+                <div class="bg-light border text-center fw-bold d-flex align-items-center justify-content-center text-secondary rounded-0" style="width: 60px; height: 60px; min-width: 60px;">
+                  LAB
+                </div>
+                <div>
+                  <h4 class="h6 fw-bold m-0 text-dark text-uppercase">Coordenação Científica Geral</h4>
+                  <p class="text-secondary small mb-1">Prof. Dr. Reginaldo Santos (Exemplo)</p>
+                  <span class="text-muted small d-block">Faculdade de Ciências Biológicas — UFPA</span>
+                </div>
               </div>
 
-              <template v-if="animaisAgrupados.length > 1">
-                <button class="carousel-control-prev" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="prev">
-                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Anterior</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#catalogoAnimaisCarousel" data-bs-slide="next">
-                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                  <span class="visually-hidden">Próximo</span>
-                </button>
-              </template>
+              <div class="d-flex align-items-start gap-3 mb-4">
+                <div class="bg-light border text-center fw-bold d-flex align-items-center justify-content-center text-secondary rounded-0" style="width: 60px; height: 60px; min-width: 60px;">
+                  VET
+                </div>
+                <div>
+                  <h4 class="h6 fw-bold m-0 text-dark text-uppercase">Manejo e Medicina Veterinária</h4>
+                  <p class="text-secondary small mb-1">Dra. Mariana Lima (Exemplo)</p>
+                  <span class="text-muted small d-block">Especialista em Animais Silvestres</span>
+                </div>
+              </div>
+
+              <div class="bg-light p-3 border-start border-success border-4 rounded-0">
+                <span class="fw-bold text-dark small d-block text-uppercase">Localização Física</span>
+                <span class="text-secondary small">Prédio da Biologia, Setor de Ecologia, Campus Guamá — UFPA.</span>
+              </div>
             </div>
-          </template>
+          </div>
         </div>
       </section>
     </main>
@@ -124,51 +222,21 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import NavBarPublic from '@/components/NavBarPublic.vue'
 import Footer from '@/components/Footer.vue'
 
-type Publicado = {
-  coordenadas?: {
-    lat?: number
-    lng?: number
-  }
-  animal?: string
-  local?: string
-  data?: string
-}
+// Tipagens originais mantidas
+type Publicado = { coordenadas?: { lat?: number; lng?: number }; animal?: string; local?: string; data?: string }
+type CategoriaApi = { id_categoria: number; nome_popular?: string | null; nome_cientifico?: string | null; foto?: string | null }
+type EspecieApi = { id_especie: number; nome_popular?: string | null; nome_cientifico?: string | null; descricao?: string | null; foto?: string | null; categoria?: CategoriaApi | null }
+type AnimalCatalogado = { id: number; nome: string; nomeCientifico: string; categoria: string; descricao: string; imagem: string }
 
-type CategoriaApi = {
-  id_categoria: number
-  nome_popular?: string | null
-  nome_cientifico?: string | null
-  foto?: string | null
-}
+// 🟢 NOVAS VARIÁVEIS PARA AS NOTÍCIAS
+const noticias = ref<any[]>([])
+const carregandoNoticias = ref(true)
 
-type EspecieApi = {
-  id_especie: number
-  nome_popular?: string | null
-  nome_cientifico?: string | null
-  descricao?: string | null
-  foto?: string | null
-  categoria?: CategoriaApi | null
-}
-
-type AnimalCatalogado = {
-  id: number
-  nome: string
-  nomeCientifico: string
-  categoria: string
-  descricao: string
-  imagem: string
-}
 const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-
 const router = useRouter()
-const API_BASE = isLocal 
-  ? 'http://localhost:8000/api' 
-  : 'https://conviva-labev.onrender.com/api'
 
-const STORAGE_BASE = isLocal 
-  ? 'http://localhost:8000/storage' 
-  : 'https://conviva-labev.onrender.com/storage'
-
+const API_BASE = isLocal ? 'http://localhost:8000/api' : 'https://conviva-labev.onrender.com/api'
+const STORAGE_BASE = isLocal ? 'http://localhost:8000/storage' : 'https://conviva-labev.onrender.com/storage'
 const FALLBACK_IMAGE = 'https://cdn-icons-png.flaticon.com/512/616/616408.png'
 const MAX_ANIMAIS_CARROSSEL = 9
 
@@ -176,12 +244,7 @@ const carregandoAnimaisCatalogados = ref(true)
 const erroAnimaisCatalogados = ref('')
 const animaisCatalogados = ref<AnimalCatalogado[]>([])
 
-const props = defineProps({
-  publicados: {
-    type: Array,
-    default: () => [],
-  },
-})
+const props = defineProps({ publicados: { type: Array, default: () => [] } })
 
 const animaisExibidos = computed(() => animaisCatalogados.value.slice(0, MAX_ANIMAIS_CARROSSEL))
 
@@ -194,63 +257,62 @@ const animaisAgrupados = computed(() => {
   return grupos
 })
 
+// 🟢 NOVO COMPLEMENTO: Agrupamento das notícias da API de 3 em 3 para o carrossel
+const noticiasAgrupadas = computed(() => {
+  const grupos = []
+  const tamanhoGrupo = 3
+  for (let i = 0; i < noticias.value.length; i += tamanhoGrupo) {
+    grupos.push(noticias.value.slice(i, i + tamanhoGrupo))
+  }
+  return grupos
+})
+
 let map: L.Map | null = null
 const markerGroup = L.layerGroup()
-
 const LAT_UFPA = -1.4748
 const LNG_UFPA = -48.4542
 
-const irParaDenuncia = () => {
-  router.push('/denuncia')
-}
-
-const irParaCatalogo = () => {
-  router.push('/catalogo')
-}
-
+const irParaDenuncia = () => router.push('/denuncia')
 const normalizarTexto = (valor: unknown) => (valor ?? '').toString().trim()
+
+// 🟢 NOVA FUNÇÃO: Busca as notícias reais criadas pelo administrador
+const buscarNoticiasAPI = async () => {
+  try {
+    carregandoNoticias.value = true
+    const response = await axios.get(`${API_BASE}/posts`)
+    const dados = Array.isArray(response.data) ? response.data : response.data.data || []
+    // Armazena as 6 últimas notícias do banco
+    noticias.value = dados.slice(0, 6)
+  } catch (error) {
+    console.error('Erro ao listar notícias na Home:', error)
+  } finally {
+    carregandoNoticias.value = false
+  }
+}
 
 const carregarAnimaisCatalogados = async () => {
   try {
     carregandoAnimaisCatalogados.value = true
     erroAnimaisCatalogados.value = ''
-
     const response = await axios.get<EspecieApi[]>(`${API_BASE}/especies`)
 
     animaisCatalogados.value = response.data.map((especie) => {
-      // 1. Limpa o nome da foto retornado pela API
-      const nomeFoto = normalizarTexto(especie.foto);
-      
-      // 2. Decide a URL com base no cenário correto
-      let urlImagem = FALLBACK_IMAGE;
+      const nomeFoto = normalizarTexto(especie.foto)
+      let urlImagem = FALLBACK_IMAGE
       if (nomeFoto) {
-        if (isLocal) {
-          // Localmente busca direto da pasta pública de desenvolvimento
-          urlImagem = `${STORAGE_BASE}/${nomeFoto}`;
-        } else {
-          // Em produção, passa pela rota do Laravel para injetar o CORS
-          // Se o nome no banco já contiver o prefixo "public/", removemos para a rota funcionar perfeitamente
-          const nomeLimpo = nomeFoto.replace(/^public\//, '');
-          urlImagem = `${STORAGE_BASE}/${nomeLimpo}`;
-        }
+        urlImagem = isLocal ? `${STORAGE_BASE}/${nomeFoto}` : `${STORAGE_BASE}/${nomeFoto.replace(/^public\//, '')}`
       }
-
       return {
         id: especie.id_especie,
         nome: normalizarTexto(especie.nome_popular) || 'Espécie sem nome popular',
         nomeCientifico: normalizarTexto(especie.nome_cientifico) || 'Nome científico indisponível',
-        categoria:
-          normalizarTexto(especie.categoria?.nome_popular) ||
-          normalizarTexto(especie.categoria?.nome_cientifico) ||
-          'Categoria não informada',
-        descricao: normalizarTexto(especie.descricao) || 'Sem descrição cadastrada para esta espécie.',
-        imagem: urlImagem, // URL devidamente higienizada e livre do bloqueio ORB
-      };
+        categoria: normalizarTexto(especie.categoria?.nome_popular) || 'Categoria não informada',
+        descricao: normalizarTexto(especie.descricao) || 'Sem descrição cadastrada.',
+        imagem: urlImagem
+      }
     })
   } catch (error) {
-    console.error('Erro ao carregar animais catalogados:', error)
     erroAnimaisCatalogados.value = 'Não foi possível carregar os animais catalogados no momento.'
-    animaisCatalogados.value = []
   } finally {
     carregandoAnimaisCatalogados.value = false
   }
@@ -258,24 +320,17 @@ const carregarAnimaisCatalogados = async () => {
 
 const renderizarMarcadores = () => {
   if (!map) return
-
   markerGroup.clearLayers()
-
   ;(props.publicados as Publicado[]).forEach((animal) => {
     const lat = animal?.coordenadas?.lat
     const lng = animal?.coordenadas?.lng
-
     if (typeof lat === 'number' && typeof lng === 'number') {
       const marker = L.marker([lat, lng])
-
       const popupContent = `
         <div style="font-family: sans-serif; padding: 5px;">
           <h6 style="margin: 0 0 5px 0; font-weight: bold; color: #198754;">${animal.animal ?? 'Animal'}</h6>
           <p style="margin: 0 0 5px 0; font-size: 12px;"><strong>Local:</strong> ${animal.local ?? 'Não informado'}</p>
-          <p style="margin: 0; font-size: 11px; color: #6c757d;">Registrado em: ${animal.data ?? '-'}</p>
-        </div>
-      `
-
+        </div>`
       marker.bindPopup(popupContent)
       markerGroup.addLayer(marker)
     }
@@ -284,134 +339,62 @@ const renderizarMarcadores = () => {
 
 const inicializarMapa = () => {
   map = L.map('mapa-fauna').setView([LAT_UFPA, LNG_UFPA], 15)
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-  }).addTo(map)
-
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
   markerGroup.addTo(map)
   renderizarMarcadores()
 }
 
-watch(
-  () => props.publicados,
-  () => {
-    renderizarMarcadores()
-  },
-  { deep: true }
-)
+watch(() => props.publicados, () => renderizarMarcadores(), { deep: true })
 
 onMounted(() => {
   inicializarMapa()
   carregarAnimaisCatalogados()
+  buscarNoticiasAPI() // Ativa busca das notícias criadas no painel
 })
 </script>
 
 <style scoped>
+.rounded-0 { border-radius: 0px !important; }
+.tracking-widest { letter-spacing: 0.15em; }
+.tracking-wider { letter-spacing: 0.08em; }
+.tracking-tight { letter-spacing: -0.02em; }
+.fw-extrabold { font-weight: 800; }
+.text-success-light { color: #58d68d; }
+
 .hero-banner {
-  min-height: 400px;
+  min-height: 480px;
   background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
 }
 
 .hero-overlay {
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.1) 100%);
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 100%);
 }
 
-
-.hero-card { 
-  background: color#eef6ec; 
-  padding: 3rem; border: ; 
-  backdrop-filter: blur(8px); 
+.card-noticia-hover {
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.banner-text-right {
-  max-width: 450px;
+.card-noticia-hover:hover {
+  transform: translateY(-3px);
+  border-color: #212529 !important;
 }
 
-.catalog-section {
-  background: linear-gradient(180deg, #f7fbf8 0%, #eef6ef 100%);
-}
-
-.section-title {
-  color: #14532d;
-  font-size: 2.5rem;
-}
-
-.catalog-carousel {
-  position: relative;
-  padding-bottom: 2.5rem;
-}
-
-.catalog-card {
-  border-radius: 20px;
-  background: #ffffff;
-  border: 1px solid rgba(20, 83, 45, 0.08);
-  transition: transform 0.2s ease;
+.text-limit-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-.catalog-card:hover {
-  transform: translateY(-4px);
-}
-
-figure {
-  height: 200px;
-  width: 100%;
-}
-
-.catalog-image {
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-}
-
-.linha-limitada {
+.text-limit-3 {
   display: -webkit-box;
-  line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.carousel-indicators [data-bs-target] {
-  background-color: #2d6a4f;
-}
-
-.carousel-control-prev {
-  left: -3.5rem;
-}
-
-.carousel-control-next {
-  right: -3.5rem;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
-  background-color: #2d6a4f;
-  border-radius: 50%;
-  padding: 1.25rem;
-}
-
-@media (max-width: 1200px) {
-  .carousel-control-prev {
-    left: -1.5rem;
-  }
-
-  .carousel-control-next {
-    right: -1.5rem;
-  }
 }
 
 @media (max-width: 767.98px) {
-  #mapa-fauna {
-    height: 350px;
-  }
-
-  .section-title {
-    font-size: 2rem;
-  }
+  .hero-banner { min-height: 400px; }
+  #mapa-fauna { min-height: 300px !important; }
 }
-
-
 </style>

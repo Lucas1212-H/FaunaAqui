@@ -9,6 +9,7 @@ use App\Http\Controllers\EspecieController;
 use App\Http\Controllers\AuthController;
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -25,6 +26,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::post('/registrar', [AuthController::class, 'registrar']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/esqueci-senha', [AuthController::class, 'forgotPassword']);
+Route::post('/redefinir-senha', [AuthController::class, 'resetPassword']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
@@ -69,4 +72,11 @@ Route::get('/imagens/{filename}', function ($filename) {
         'Access-control-allow-origin' => '*',
         'Access-control-allow-methods' => 'GET',
     ]);
+});
+
+Route::get('/posts', [PostController::class, 'index']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/posts', [PostController::class, 'store']);
+    Route::put('/posts/{id}', [PostController::class, 'update']);
+    Route::delete('/posts/{id}', [PostController::class, 'destroy']);
 });

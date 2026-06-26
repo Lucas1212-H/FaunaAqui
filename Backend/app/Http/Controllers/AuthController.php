@@ -151,4 +151,46 @@ class AuthController extends Controller
             'message' => 'Sua conta foi excluída com sucesso.'
         ], 200);
     }
+
+    public function forgotPassword(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $status = \Illuminate\Support\Facades\Password::broker()->sendResetLink(
+            $request->only('email')
+        );
+
+        if ($status === \Illuminate\Support\Facades\Password::RESET_LINK_SENT) {
+            return response()->json(['message' => 'Um link de recuperação de senha foi enviado para o seu e-mail.'], 200);
+        }
+
+        return response()->json(['message' => 'Não foi possível enviar o link de recuperação. Verifique o e-mail informado.'], 400);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $status = \Illuminate\Support\Facades\Password::broker()->reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->save();
+                
+                // Opicional: se quiser deslogar de todas as sessões ao resetar a senha
+                $user->tokens()->delete();
+            }
+        );
+
+        if ($status === \Illuminate\Support\Facades\Password::PASSWORD_RESET) {
+            return response()->json(['message' => 'Sua senha foi redefinida com sucesso!'], 200);
+        }
+
+        return response()->json(['message' => 'Token inválido ou expirado.'], 400);
+    }
 }

@@ -13,6 +13,16 @@
 
               <div class="col-12 col-md-8 bg-white p-3 p-sm-4 d-flex flex-column justify-content-start corpo-formulario">
 
+                <div v-if="passoAtual > 1 && !denunciaEnviada && !enviando" class="mb-3 text-start">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-secondary rounded-0 text-uppercase fw-semibold px-3"
+                    @click="voltarPasso"
+                  >
+                    ← Voltar Passo
+                  </button>
+                </div>
+
                 <UiMessage
                   v-if="mensagemErro && !denunciaEnviada"
                   type="error"
@@ -109,6 +119,13 @@ const formData = reactive({
   foto: null
 })
 
+// 🟢 NOVA FUNÇÃO: Decrementar o passo atual de forma segura
+const voltarPasso = () => {
+  if (passoAtual.value > 1) {
+    passoAtual.value--
+  }
+}
+
 const avancarPasso1 = (cont) => {
   formData.contatoNome = cont.nome || ''
   formData.contato = cont.contato || { tipo: '', valor: '' }
@@ -130,7 +147,6 @@ const avancarPasso4 = (loc) => {
 const finalizarFormulario = async (dadosFoto) => {
   formData.foto = dadosFoto.foto
   
-  // Validação
   if (!formData.foto) {
     mensagemErro.value = 'Foto é obrigatória'
     return
@@ -145,7 +161,6 @@ const finalizarFormulario = async (dadosFoto) => {
     enviando.value = true
     mensagemErro.value = ''
 
-    // Prepara os dados conforme o backend espera
     const dadosParaEnviar = {
       denunciante_nome: formData.contatoNome,
       denunciante_contato_tipo: formData.contato.tipo,
@@ -160,16 +175,12 @@ const finalizarFormulario = async (dadosFoto) => {
       foto: formData.foto
     }
 
-    // Envia para o backend
     const resposta = await ocorrenciaService.criarDenuncia(dadosParaEnviar)
     
-    // Sucesso
     alert('Ocorrência enviada com sucesso!')
-    // Sucesso - mostra tela de conclusão
     mensagemErro.value = ''
     denunciaEnviada.value = true
     
-    // Reseta o formulário internal
     passoAtual.value = 1
     formData.categoria = ''
     formData.contatoNome = ''
@@ -190,11 +201,10 @@ const finalizarFormulario = async (dadosFoto) => {
 }
 
 const iniciarNovaOcorrencia = () => {
-  // Reinicia o fluxo
   denunciaEnviada.value = false
   passoAtual.value = 1
   mensagemSucesso.value = ''
-  mensagemErro.value = '' // CORRIGIDO: adicionado o .value para evitar erro de reatribuição de const
+  mensagemErro.value = '' 
 }
 
 const voltarParaInicio = () => {
@@ -204,10 +214,8 @@ const voltarParaInicio = () => {
 
 <style scoped>
 .rounded-4 { border-radius: 1.5rem !important; }
+.rounded-0 { border-radius: 0px !important; } /* Sincronia com o estilo quadrado */
 
-/* ==========================================================================
-   ESTRUTURA COMPACTA E ENRIJECIDA (PC)
-   ========================================================================== */
 @media (min-width: 768px) {
   .mix-container {
     width: min(820px, calc(100vw - 36px)) !important;
@@ -234,9 +242,6 @@ const voltarParaInicio = () => {
   }
 }
 
-/* ==========================================================================
-   COMPORTAMENTO MOBILE (CELULAR)
-   ========================================================================== */
 @media (max-width: 767.98px) {
   .mix-container {
     max-width: calc(100vw - 24px);

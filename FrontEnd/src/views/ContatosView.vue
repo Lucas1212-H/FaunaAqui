@@ -1,89 +1,99 @@
 <template>
-  <div class="contatos-Page">    
+  <div class="contatos-page bg-light text-dark text-sans-serif">    
     <NavBarPublic />
       
-    <section class="hero-banner position-relative d-flex align-items-end">
+    <header class="hero-banner position-relative d-flex align-items-center justify-content-start text-start">
       <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
       
-      <div class="container-fluid px-5 pb-5 position-relative z-index-2 text-white">
-        <nav aria-label="breadcrumb" class="mb-2">
-          <ol class="breadcrumb tiny-text tracking-wider text-uppercase text-white-50 m-0">
-            <li class="breadcrumb-item"><a href="#" class="text-white-50 text-decoration-none">Home</a></li>
-            <li class="breadcrumb-item active text-white" aria-current="page">Contatos</li>
+      <div class="container position-relative z-index-2 text-white px-4 px-md-5">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb tiny-text tracking-widest text-uppercase m-0">
+            <li class="breadcrumb-item">
+              <RouterLink class="text-white-50 text-decoration-none" to="/">Início</RouterLink>
+            </li>
+            <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Contatos</li>
           </ol>
         </nav>
         
-        <h1 class="display-4 fw-bold m-0 hero-title">Contatos</h1>
+        <span class="text-uppercase tracking-widest fw-bold text-success-light mb-1 d-inline-block small">Atendimento e Suporte</span>
+        <h1 class="display-3 fw-extrabold m-0 text-uppercase tracking-tight hero-title">Fale Conosco</h1>
       </div>
-    </section>
+    </header>
 
-    <!-- Conteúdo da página -->
-
-
-    <!-- Formulário de Contato -->    
-    <div class="contact-form-card mt-5 p-4 bg-white rounded shadow-sm mx-auto mb-4">
-      <h2 class="h5 fw-bold mb-3">Fale com a gente</h2>
-      <p class="text-secondary mb-4">Deixe sua mensagem que entraremos em contato o mais breve possível.</p>
-      <form @submit.prevent="handleSubmit">
-        <div class="mb-3">
-          <label for="nome" class="form-label">Nome</label>
-          <input v-model="form.nome" id="nome" type="text" class="form-control" placeholder="Seu nome" required />
-        </div>
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input v-model="form.email" id="email" type="email" class="form-control" placeholder="seu@email.com" required />
-        </div>
-        <div class="mb-3">
-          <label for="mensagem" class="form-label">Mensagem</label>
-          <textarea v-model="form.mensagem" id="mensagem" rows="5" class="form-control" placeholder="Escreva sua mensagem" required></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Enviar</button>
-      </form>
-    </div>
-
-
-    <!-- foto e texto contato 1 -->
-    <div class="min-vh-10 bg-light d-flex align-items-start justify-content-center p-2 p-md-3">
-      <div class="row w-100 m-0 g-4" style="max-width: 600px;">
-        <div class="col-12 col-md-6">
-          <div class="p-4 bg-white rounded shadow-sm text-center">
-          <img
-            src="../assets/images/perfil2.jpg"
-            alt="Foto de Contato professora kita"
-            class="img-fluid"/>
-
-          </div>
-        </div>
-
-        <div class="col-12 col-md-6">
-          <div class="p-4 bg-white rounded shadow-sm">
-            <p class="text-muted m-0">aqui entra as formas publicas de contatato com a professora kita, por exemplo, e-mail e redes sociais.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- foto e texto contato 2 -->
-<div class="min-vh-10 bg-light d-flex align-items-start justify-content-center p-2 p-md-3">
-      <div class="row w-10 m-0 g-4" style="max-width: 600px;">
+    <main class="container my-5 py-4">
+      <div class="row g-5 text-start">
         
-        <div class="col-12 col-md-6">
-          <div class="p-4 bg-white rounded shadow-sm">
-            <p class="text-muted m-0">aqui entra as formas publicas de contatato com a professor André Nunes, por exemplo, e-mail e redes sociais.</p>
+        <div class="col-lg-7">
+          <article class="p-4 p-md-5 bg-white border rounded-0 shadow-sm">
+            <h2 class="h3 fw-extrabold text-uppercase tracking-tight text-dark mb-2">Envie uma Mensagem</h2>
+            <p class="text-secondary small mb-4">Tem alguma dúvida acadêmica, sugestão ou feedback sobre o projeto? Preencha os campos abaixo.</p>
+            
+            <form @submit.prevent="handleSubmit">
+              <div class="mb-3">
+                <label for="nome" class="form-label text-uppercase small fw-bold tracking-wider text-secondary">Nome Completo</label>
+                <input v-model="form.nome" id="nome" type="text" class="form-control rounded-0 p-3" placeholder="Insira seu nome" required />
+              </div>
+              
+              <div class="mb-3">
+                <label for="email" class="form-label text-uppercase small fw-bold tracking-wider text-secondary">Endereço de E-mail</label>
+                <input v-model="form.email" id="email" type="email" class="form-control rounded-0 p-3" placeholder="seu@email.com" required />
+              </div>
+              
+              <div class="mb-4">
+                <label for="mensagem" class="form-label text-uppercase small fw-bold tracking-wider text-secondary">Sua Mensagem</label>
+                <textarea v-model="form.mensagem" id="mensagem" rows="5" class="form-control rounded-0 p-3" placeholder="Escreva detalhadamente o motivo do seu contato..." required></textarea>
+              </div>
+              
+              <button type="submit" class="btn btn-dark rounded-0 fw-bold text-uppercase tracking-wider px-5 py-3 w-100">
+                Enviar Mensagem
+              </button>
+            </form>
+          </article>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="d-flex flex-column gap-4">
+            <h2 class="h3 fw-extrabold text-uppercase tracking-tight text-dark m-0 border-bottom pb-2">Coordenação do Projeto</h2>
+            
+            <section class="card border rounded-0 shadow-sm bg-white overflow-hidden">
+              <div class="row g-0 align-items-center">
+                <div class="col-sm-4 bg-light border-end d-flex align-items-center justify-content-center overflow-hidden h-100" style="min-height: 140px;">
+                  <img src="../assets/images/perfil2.jpg" alt="Foto de Perfil — Profa. Dra. Kita" class="w-100 h-100" style="object-fit: cover;" />
+                </div>
+                <div class="col-sm-8">
+                  <div class="card-body p-3">
+                    <span class="badge rounded-0 bg-success text-uppercase mb-1 small">Fundadora</span>
+                    <h3 class="h6 fw-bold text-dark m-0 text-uppercase">Profa. Dra. Kita</h3>
+                    <p class="text-muted small m-0 mt-2 lh-sm">
+                      Contato institucional, parcerias científicas, e-mail acadêmico e redes de monitoramento biológico do campus.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card border rounded-0 shadow-sm bg-white overflow-hidden">
+              <div class="row g-0 align-items-center">
+                <div class="col-sm-4 bg-light border-end d-flex align-items-center justify-content-center overflow-hidden h-100" style="min-height: 140px;">
+                  <img src="../assets/images/perfil2.jpg" alt="Foto de Perfil — Prof. Dr. André Nunes" class="w-100 h-100" style="object-fit: cover;" />
+                </div>
+                <div class="col-sm-8">
+                  <div class="card-body p-3">
+                    <span class="badge rounded-0 bg-dark text-white text-uppercase mb-1 small">Coordenador</span>
+                    <h3 class="h6 fw-bold text-dark m-0 text-uppercase">Prof. Dr. André Nunes</h3>
+                    <p class="text-muted small m-0 mt-2 lh-sm">
+                      Manejo técnico de ecologia, supervisão do LABEV, dados estatísticos de fauna silvestre e mapeamento espacial.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
           </div>
         </div>
 
-        <div class="col-12 col-md-6">
-          <div class="p-4 bg-white rounded shadow-sm text-center">
-          <img
-            src="../assets/images/perfil2.jpg"
-            alt="Foto do Professor André Nunes"
-            class="img-fluid"/>
-
-          </div>
-        </div>
-      
       </div>
-    </div>
+    </main>
 
     <Footer />
   </div>
@@ -91,6 +101,7 @@
 
 <script setup>
 import { reactive } from 'vue'
+import { RouterLink } from 'vue-router'
 import NavBarPublic from '@/components/NavBarPublic.vue'
 import Footer from '@/components/Footer.vue'
 
@@ -101,7 +112,7 @@ const form = reactive({
 })
 
 const handleSubmit = () => {
-  alert(`Mensagem enviada!\nNome: ${form.nome}\nEmail: ${form.email}`)
+  alert(`Mensagem enviada com sucesso!\n\nNome: ${form.nome}\nEmail: ${form.email}`)
   form.nome = ''
   form.email = ''
   form.mensagem = ''
@@ -109,56 +120,25 @@ const handleSubmit = () => {
 </script>
 
 <style scoped>
-/* --- CONFIGURAÇÕES DE PALETA E TIPOGRAFIA --- */
+.rounded-0 { border-radius: 0px !important; }
+.fw-extrabold { font-weight: 800; }
+.tracking-widest { letter-spacing: 0.15em; }
+.tracking-wider { letter-spacing: 0.08em; }
+.tracking-tight { letter-spacing: -0.02em; }
+.text-success-light { color: #58d68d; }
+
 .text-sans-serif {
-  font-family: 'Inter', 'Montserrat', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Cores Customizadas */
-.top-bar {
-  background-color: #1f6b6d; /* Verde Petróleo Escuro */
-}
-.text-petroleo { color: #1f6b6d; }
-.text-oliva { color: #556b2f; }      /* Verde Oliva Corporativo */
-.text-laranja-oliva { color: #d4a373; } /* Tom terroso secundário */
-.text-dark-custom { color: #333333; }
-
-/* Menu Ativo */
-.active-green {
-  color: #70a1ff !important; /* Ajuste para a cor ativa destacada */
-  color: #7ba986 !important; /* Exemplo de verde claro institucional ativo */
-}
-
-/* Ajustes de Fontes Finas/Especiais */
-.tiny-text {
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-.tracking-wide { letter-spacing: 0.1em; }
-.tracking-wider { letter-spacing: 0.15em; }
-.tracking-widest { letter-spacing: 0.2em; }
-.tracking-tight { letter-spacing: -0.05em; }
-
-.phone-number {
-  font-size: 0.95rem;
-  color: #212529;
-}
-
-/* --- BANNER HERO --- */
 .hero-banner {
-  height: 420px; /* Layout Horizontal Widescreen */
-  /* Substitua pelo caminho real da imagem da muda/solo */
-  background-image: url('../assets/images/banner_macaco.jpg');
-  background-size: cover;
-  background-position: center 60%;
-  position: relative;
-  /* Linha inferior de acabamento ecológico */
-  border-bottom: 6px solid #9ef01a; 
+  min-height: 400px;
+  background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
 }
 
 .hero-overlay {
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.5) 100%);
   z-index: 1;
 }
 
@@ -166,58 +146,30 @@ const handleSubmit = () => {
   z-index: 2;
 }
 
-.hero-title {
-  font-size: 3.5rem;
-  letter-spacing: -0.02em;
+.form-control {
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Customização leve do Breadcrumb para aceitar setas separadoras brancas */
+.form-control:focus {
+  border-color: #111827;
+  box-shadow: none;
+}
+
 .breadcrumb-item + .breadcrumb-item::before {
-  content: ">" !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  content: "→" !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.85rem;
+  padding: 0 8px;
 }
 
-/* Responsividade de Mídia */
-@media (max-width: 1200px) {
-  .hidden-md-down {
-    display: none !important;
-  }
+.tiny-text {
+  font-size: 0.75rem;
 }
 
-.contact-form-card {
-  max-width: 720px;
-  border: 1px solid rgba(34, 91, 56, 0.12);
-  background-color: #eef6ec;
-  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.06);
-}
-
-.contact-form-card h2 {
-  color: #214d30;
-}
-
-.contact-form-card p {
-  color: #4f6b55;
-}
-
-.contact-form-card .form-control {
-  border-radius: 12px;
-  border-color: rgba(34, 91, 56, 0.18);
-  background-color: #f8fbf7;
-}
-
-.contact-form-card .form-control:focus {
-  box-shadow: 0 0 0 0.2rem rgba(34, 91, 56, 0.15);
-}
-
-.contact-form-card button {
-  border-radius: 12px;
-  padding: 0.9rem 1.5rem;
-  background-color: #2f7a3d;
-  border-color: #2f7a3d;
-}
-
-.contact-form-card button:hover {
-  background-color: #245f30;
-  border-color: #245f30;
+@media (max-width: 767.98px) {
+  .hero-banner { min-height: 320px; }
+  .display-3 { font-size: 2.25rem; }
 }
 </style>

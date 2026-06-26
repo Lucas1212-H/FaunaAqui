@@ -1,118 +1,127 @@
 <template>
-  <div class="quem-somos-page">
+  <div class="quem-somos-page bg-light text-dark text-sans-serif">
     <NavBarPublic />
 
-    <section class="hero-banner position-relative d-flex align-items-end">
+    <header class="hero-banner position-relative d-flex align-items-center justify-content-start text-start">
       <div class="hero-overlay position-absolute top-0 start-0 w-100 h-100"></div>
       
-      <div class="container-fluid px-5 pb-5 position-relative z-index-2 text-white">
-        <nav aria-label="breadcrumb" class="mb-2">
-          <ol class="breadcrumb tiny-text tracking-wider text-uppercase text-white-50 m-0">
+      <div class="container position-relative z-index-2 text-white px-4 px-md-5">
+        <nav aria-label="breadcrumb" class="mb-3">
+          <ol class="breadcrumb tiny-text tracking-widest text-uppercase m-0">
             <li class="breadcrumb-item">
-              <RouterLink class="text-white-50 text-decoration-none" to="/">Home</RouterLink>
+              <RouterLink class="text-white-50 text-decoration-none" to="/">Início</RouterLink>
             </li>
-            <li class="breadcrumb-item active text-white" aria-current="page">Sobre Nós</li>
+            <li class="breadcrumb-item active text-white fw-bold" aria-current="page">Sobre Nós</li>
           </ol>
         </nav>
         
-        <h1 class="display-4 fw-bold m-0 hero-title">Sobre Nós</h1>
+        <span class="text-uppercase tracking-widest fw-bold text-success-light mb-1 d-inline-block small">Nossa História</span>
+        <h1 class="display-3 fw-extrabold m-0 text-uppercase tracking-tight hero-title">Conheça o ConViva</h1>
       </div>
-    </section>
+    </header>
 
-    <!-- Conteúdo da página -->
-    <section class="container my-5 py-4">
-      <div class="row align-items-center g-5">
+    <main class="container my-5 py-4 text-start">
+      <section class="row align-items-stretch g-5 mb-5">
         
-        <div class="col-md-6 col-lg-7">
-          <div class="position-relative">
-            <img 
-              src="../assets/images/snake.jpg" 
-              alt="cobra sobre uma folha" 
-              class="img-fluid rounded shadow-sm w-100"
-            />
+        <div class="col-lg-6 d-flex flex-column justify-content-between">
+          <div class="border bg-white p-2 h-100 shadow-sm rounded-0">
+            <figure class="m-0 h-100 overflow-hidden rounded-0">
+              <img 
+                src="../assets/images/snake.jpg" 
+                alt="Fotografia de monitoramento biológico — Serpente" 
+                class="w-100 h-100 img-sobre-foco"
+              />
+            </figure>
           </div>
-          
-          <div class="mt-4">
-            <span class="text-muted fw-bold text-uppercase small d-block mb-1">Quem Somos</span>
-            <h2 class="h4 fw-bold text-dark">
-              O projeto conviva é uma extensão do laboratório de biologia da UFPA.
+        </div>
+
+        <div class="col-lg-6 d-flex flex-column justify-content-center">
+          <div class="ps-lg-4">
+            <span class="text-success text-uppercase fw-bold small tracking-wider mb-2 d-block">Origem do Projeto</span>
+            <h2 class="display-5 fw-extrabold text-uppercase tracking-tight text-dark mb-4 lh-tight">
+              Ciência Cidadã e Apoio à <span class="fw-light text-lowercase text-capitalize text-success-light">Fauna</span> Local
             </h2>
+            
+            <p class="fs-5 text-secondary lh-lg mb-4">
+              O projeto <strong>ConViva</strong> atua de forma integrada como uma extensão essencial do Laboratório de Ecologia e Conservação de Vertebrados (LABEV) da Universidade Federal do Pará (UFPA).
+            </p>
+            
+            <p class="text-body-secondary lh-lg mb-0">
+              Fundada originalmente no ano de 2000 pela iniciativa da <strong>Professora Kita</strong>, a organização nasceu de uma necessidade real de segurança e coexistência pacífica. Após um incidente de ataque de serpente envolvendo uma estudante no campus, a professora idealizou um canal técnico estruturado para capacitar a população acadêmica e do entorno a manejar encontros com animais silvestres corretamente, além de gerar dados científicos valiosos para a preservação das espécies amazônicas urbanas.
+            </p>
           </div>
         </div>
 
-        <div class="col-md-6 col-lg-5">
-          <h1 class="display-6 fw-normal text-dark mb-4">
-            Conheça o nosso projeto criado para defesa da <strong class="fw-bold">fauna</strong> local e para o apoio à ciência cidadã.
-          </h1>
-          
-          <p class="text-secondary lh-lg" style="font-size: 0.95rem;">
-            Organização foi fundada em 2000, pela professora Kita. Após uma aluna ser atacada por uma serpente, a professora decidiu criar um projeto para ajudar a população a lidar com esses animais e também para ajudar a ciência a entender melhor a fauna local.
-          </p>
-        </div>
+      </section>
 
-      </div>
-    </section>
+      <section class="py-5 border-top">
+        <div class="row g-4">
+          
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-0 h-100 shadow-sm">
+              <div class="text-success fw-bold h3 mb-3">01</div>
+              <h3 class="h5 fw-bold text-dark text-uppercase tracking-wide mb-2">Monitoramento Ativo</h3>
+              <p class="text-secondary small lh-lg mb-0">
+                Coleta sistemática de relatórios de avistamentos feitos por estudantes, professores e moradores do entorno da UFPA para mapear corredores ecológicos urbanos.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-0 h-100 shadow-sm">
+              <div class="text-success fw-bold h3 mb-3">02</div>
+              <h3 class="h5 fw-bold text-dark text-uppercase tracking-wide mb-2">Preservação Segura</h3>
+              <p class="text-secondary small lh-lg mb-0">
+                Mitigação de acidentes e conflitos entre seres humanos e animais, assegurando o resgate e a destinação científica correta da fauna sem o extermínio de espécimes.
+              </p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-0 h-100 shadow-sm">
+              <div class="text-success fw-bold h3 mb-3">03</div>
+              <h3 class="h5 fw-bold text-dark text-uppercase tracking-wide mb-2">Educação Ambiental</h3>
+              <p class="text-secondary small lh-lg mb-0">
+                Disseminação de cartilhas técnicas, relatórios biológicos abertos e palestras públicas para desmistificar o medo e combater preconceitos contra animais silvestres.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
 
     <Footer />
   </div>
 </template>
 
 <script setup>
+import { RouterLink } from 'vue-router'
 import NavBarPublic from '@/components/NavBarPublic.vue'
 import Footer from '@/components/Footer.vue'
 </script>
 
 <style scoped>
-/* --- CONFIGURAÇÕES DE PALETA E TIPOGRAFIA --- */
+/* Sincronia com o Kit Global de Estilos do Projeto */
+.rounded-0 { border-radius: 0px !important; }
+.fw-extrabold { font-weight: 800; }
+.tracking-widest { letter-spacing: 0.15em; }
+.tracking-wider { letter-spacing: 0.08em; }
+.tracking-tight { letter-spacing: -0.02em; }
+.text-success-light { color: #58d68d; }
+
 .text-sans-serif {
-  font-family: 'Inter', 'Montserrat', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Cores Customizadas */
-.top-bar {
-  background-color: #1f6b6d; /* Verde Petróleo Escuro */
-}
-.text-petroleo { color: #1f6b6d; }
-.text-oliva { color: #556b2f; }      /* Verde Oliva Corporativo */
-.text-laranja-oliva { color: #d4a373; } /* Tom terroso secundário */
-.text-dark-custom { color: #333333; }
-
-/* Menu Ativo */
-.active-green {
-  color: #70a1ff !important; /* Ajuste para a cor ativa destacada */
-  color: #7ba986 !important; /* Exemplo de verde claro institucional ativo */
-}
-
-/* Ajustes de Fontes Finas/Especiais */
-.tiny-text {
-  font-size: 0.7rem;
-  font-weight: 600;
-}
-.tracking-wide { letter-spacing: 0.1em; }
-.tracking-wider { letter-spacing: 0.15em; }
-.tracking-widest { letter-spacing: 0.2em; }
-.tracking-tight { letter-spacing: -0.05em; }
-
-.phone-number {
-  font-size: 0.95rem;
-  color: #212529;
-}
-
-/* --- BANNER HERO --- */
 .hero-banner {
-  height: 420px; /* Layout Horizontal Widescreen */
-  /* Substitua pelo caminho real da imagem da muda/solo */
-  background-image: url('../assets/images/banner_macaco.jpg');
-  background-size: cover;
-  background-position: center 60%;
-  position: relative;
-  /* Linha inferior de acabamento ecológico */
-  border-bottom: 6px solid #9ef01a; 
+  min-height: 400px;
+  background: url('@/assets/images/banner_macaco.jpg') center/cover no-repeat;
 }
 
 .hero-overlay {
-  background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.65) 100%);
+  background: linear-gradient(90deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.5) 100%);
   z-index: 1;
 }
 
@@ -120,21 +129,27 @@ import Footer from '@/components/Footer.vue'
   z-index: 2;
 }
 
-.hero-title {
-  font-size: 3.5rem;
-  letter-spacing: -0.02em;
+.img-sobre-foco {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
 }
 
-/* Customização leve do Breadcrumb para aceitar setas separadoras brancas */
+/* Customização minimalista do Breadcrumb */
 .breadcrumb-item + .breadcrumb-item::before {
-  content: ">" !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  content: "→" !important;
+  color: rgba(255, 255, 255, 0.4) !important;
+  font-size: 0.85rem;
+  padding: 0 8px;
 }
 
-/* Responsividade de Mídia */
-@media (max-width: 1200px) {
-  .hidden-md-down {
-    display: none !important;
-  }
+.tiny-text {
+  font-size: 0.75rem;
+}
+
+@media (max-width: 767.98px) {
+  .hero-banner { min-height: 320px; }
+  .display-3 { font-size: 2.25rem; }
 }
 </style>

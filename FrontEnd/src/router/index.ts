@@ -12,6 +12,10 @@ import AnimalInfo from '../components/AnimalInfo.vue'
 import { useAuth } from '../composables/useAuth'
 import EditarConta from '@/pages/EditarConta.vue'
 import AprovarUsuario from '@/pages/especialista/AprovarUsuario.vue'
+import GerenciarPosts from '../pages/GerenciarPosts.vue'
+import EsqueciSenha from '../views/EsqueciSenha.vue'
+import RedefinirSenha from '../views/RedefinirSenha.vue'
+import DetalhePostView from '../views/DetalhesPostView.vue'
 
 const routes = [
   {
@@ -19,6 +23,17 @@ const routes = [
     name: 'home',
     component: HomeView,
     meta: { title: 'Home' }
+  },
+  {
+  path: '/painel/posts',
+  name: 'gerenciar-posts',
+  component: GerenciarPosts,
+  meta: { requiresAuth: true, role: 'Administrador' } // Caso use middleware de rotas no front
+  },
+  {
+    path: '/noticias/:id',
+    name: 'detalhe-post',
+    component: DetalhePostView,
   },
   {
     path: '/cadastro',
@@ -31,6 +46,18 @@ const routes = [
     name: 'login',
     component: LoginView,
     meta: { title: 'Login', requiresGuest: true }
+  },
+  {
+    path: '/esqueci-senha',
+    name: 'esqueci-senha',
+    component: EsqueciSenha,
+    meta: { title: 'Esqueci Minha Senha', requiresGuest: true }
+  },
+  {
+    path: '/redefinir-senha',
+    name: 'redefinir-senha',
+    component: RedefinirSenha,
+    meta: { title: 'Redefinir Senha', requiresGuest: true }
   },
   {
     path: '/especialista',
@@ -82,9 +109,6 @@ const routes = [
   },
   {
     path: '/aprovar-usuario',
-
-
-    
     name: 'aprovar-usuario',
     component: AprovarUsuario,
     meta: { title: 'Aprovar Usuário', requiresAuth: true, requiresAdmin: true } // 🛡️ Bloqueio para admin
