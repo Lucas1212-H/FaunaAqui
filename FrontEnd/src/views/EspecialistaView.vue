@@ -2,7 +2,7 @@
   <div class="dashboard-page bg-light min-vh-100 d-flex flex-column">
     <NavBar :abaAtiva="abaAtiva" @mudarAba="mudarAba" />
 
-    <div class="container-fluid px-3 px-md-4 flex-grow-1 py-3 py-md-4">
+    <div class="container-fluid specialist-content px-3 px-md-4 flex-grow-1 py-3 py-md-4">
       
       <div v-if="carregando" class="text-center py-5 my-auto">
         <div class="spinner-border text-success" role="status"></div>
@@ -252,3 +252,11 @@ const gerarLaudo = (denuncia) => {
 };
 const handleGerenciarEspecies = () => console.log('Gerenciar Espécies');
 </script>
+
+<style scoped>
+.specialist-content {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+</style>

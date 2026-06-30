@@ -1,42 +1,12 @@
 <template>
   <nav class="navbar-especialista">
-    <div class="navbar-top d-flex align-items-center justify-content-between w-100">
-      <div class="navbar-brand-container">
-        <RouterLink class="brand-link text-decoration-none" :to="{ name: 'specialist-area' }">
-          <h1 class="m-0 brand-text">ConViva <span>Labev</span></h1>
-        </RouterLink>
-      </div>
-
-      <div class="user-section">
-        <div class="user-info d-none d-md-block">
-          <small class="user-name">{{ usuarioLogado?.nome || 'Usuário' }}</small>
-        </div>
-        <div class="dropdown">
-          <button
-            class="avatar-circle shadow-sm dropdown-toggle"
-            :style="{ backgroundColor: avatarColor }"
-            type="button"
-            id="userDropdown"
-            data-bs-toggle="dropdown"
-            aria-expanded="false"
-          >
-            {{ inicialNome }}
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-            <li>
-              <RouterLink class="dropdown-item" :to="{ name: 'editar-perfil' }">Editar Perfil</RouterLink>
-            </li>
-            <li v-if="isAdmin">
-              <RouterLink class="dropdown-item text-warning fw-semibold" :to="{ name: 'aprovar-usuario' }">Gerenciar Usuários</RouterLink>
-            </li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#" @click.prevent="fazerLogout">Sair</a></li>
-          </ul>
-        </div>
-      </div>
+    <div class="navbar-brand-container">
+      <RouterLink class="brand-link text-decoration-none" :to="{ name: 'specialist-area' }">
+        <h1 class="m-0 brand-text">ConViva <span>Labev</span></h1>
+      </RouterLink>
     </div>
 
-    <div class="nav-pill-container w-100">
+    <div class="nav-pill-container">
       <div class="nav-pill-bg d-flex align-items-center nav-pill-scroll">
         <button
           type="button"
@@ -62,6 +32,34 @@
           :class="{ active: abaAtiva === 'postagens' }"
           @click="selecionarAba('postagens')"
         >Postagens</button>
+      </div>
+    </div>
+
+    <div class="user-section">
+      <div class="user-info d-none d-md-block">
+        <small class="user-name">{{ usuarioLogado?.nome || 'Usuário' }}</small>
+      </div>
+      <div class="dropdown">
+        <button
+          class="avatar-circle shadow-sm dropdown-toggle"
+          :style="{ backgroundColor: avatarColor }"
+          type="button"
+          id="userDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          {{ inicialNome }}
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+          <li>
+            <RouterLink class="dropdown-item" :to="{ name: 'editar-perfil' }">Editar Perfil</RouterLink>
+          </li>
+          <li v-if="isAdmin">
+            <RouterLink class="dropdown-item text-warning fw-semibold" :to="{ name: 'aprovar-usuario' }">Gerenciar Usuários</RouterLink>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li><a class="dropdown-item text-danger" href="#" @click.prevent="fazerLogout">Sair</a></li>
+        </ul>
       </div>
     </div>
   </nav>
@@ -129,10 +127,22 @@ const fazerLogout = () => {
 .navbar-especialista {
   background-color: #58d68d;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'brand user'
+    'nav nav';
+  align-items: center;
+  column-gap: 0.75rem;
+  row-gap: 0.75rem;
   padding: 0.75rem 1rem;
+}
+
+.navbar-brand-container {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .brand-link {
@@ -152,8 +162,11 @@ const fazerLogout = () => {
 }
 
 .nav-pill-container {
+  grid-area: nav;
   display: flex;
   justify-content: center;
+  min-width: 0;
+  width: 100%;
 }
 
 .nav-pill-bg {
@@ -162,6 +175,8 @@ const fazerLogout = () => {
   padding: 6px 10px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   gap: 4px;
+  width: 100%;
+  max-width: 560px;
 }
 
 .nav-pill-scroll {
@@ -202,10 +217,12 @@ const fazerLogout = () => {
 }
 
 .user-section {
+  grid-area: user;
   display: flex;
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  justify-self: end;
 }
 
 .user-info {
@@ -270,28 +287,30 @@ const fazerLogout = () => {
     height: 50px;
     font-size: 1.2rem;
   }
+
+  .navbar-especialista {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas:
+      'brand brand user'
+      'nav nav nav';
+    column-gap: 1rem;
+  }
+
+  .navbar-brand-container {
+    justify-self: start;
+  }
 }
 
 @media (min-width: 992px) {
   .navbar-especialista {
-    flex-direction: row;
-    align-items: center;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: 'brand nav user';
     height: 80px;
     padding: 0 1.5rem;
     gap: 1rem;
   }
 
-  .navbar-top {
-    width: auto;
-    flex-shrink: 0;
-  }
-
-  .nav-pill-container {
-    flex-grow: 1;
-  }
-
   .nav-pill-bg {
-    min-width: 450px;
     padding: 8px 15px;
     margin: 0 auto;
   }

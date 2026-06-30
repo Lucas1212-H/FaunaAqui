@@ -11,7 +11,7 @@
 
     <div class="col-lg-8">
       <div class="data-card p-4 h-100 shadow-sm">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 panel-header">
           <h4 class="fw-bold m-0 text-dark">Fila de Triagem</h4>
           <div class="input-group search-group">
             <span class="input-group-text bg-white border-0 shadow-sm">
@@ -122,7 +122,8 @@ const getStatusClass = (status) => {
   --bs-table-bg: transparent; 
 }
 .table-responsive { 
-  max-height: 400px; 
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .rounded-4 { 
   border-radius: 0.9rem; 
@@ -130,10 +131,31 @@ const getStatusClass = (status) => {
 .action-btn { 
   border-radius: 0.55rem; 
 }
+.search-group {
+  width: auto;
+  min-width: 220px;
+  max-width: 320px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 992px) {
+  .table-responsive {
+    max-height: min(60vh, 560px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
 
 @media (max-width: 767.98px) {
   .search-group {
     width: 100% !important;
+    max-width: none;
   }
 
   .data-card {

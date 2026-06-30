@@ -45,7 +45,7 @@
 </template>
 
 <script setup>
-import { onMounted, watch, ref } from 'vue';
+import { onMounted, watch, onBeforeUnmount, nextTick } from 'vue';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -110,14 +110,34 @@ watch(() => props.publicados, () => {
   renderizarMarcadores();
 }, { deep: true });
 
-onMounted(() => {
+onMounted(async () => {
+  await nextTick();
   inicializarMapa();
+  window.addEventListener('resize', handleResize);
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize);
+  if (map) {
+    map.remove();
+    map = null;
+  }
+});
+
+const handleResize = () => {
+  if (map) {
+    map.invalidateSize();
+  }
+};
 </script>
 
 <style scoped>
 .map-card { background: #dfe6df; border-radius: 18px; color: #2f3a33; border: 1px solid #c8d0c9; }
 .table { --bs-table-bg: transparent; }
+.table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
 .rounded-4 { border-radius: 0.9rem; }
 .clickable-row { cursor: pointer; }
 .clickable-row:hover { background: #f4f7f4; }
@@ -126,6 +146,25 @@ onMounted(() => {
 .mapa-publicados {
   height: 400px;
   width: 100%;
+  min-height: 280px;
+}
+
+@media (min-width: 992px) {
+  .mapa-publicados {
+    height: min(45vh, 520px);
+  }
+
+  .table-responsive {
+    max-height: min(40vh, 420px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 767.98px) {

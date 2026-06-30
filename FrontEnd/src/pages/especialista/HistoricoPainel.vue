@@ -4,9 +4,9 @@
       
       <div class="archived-card p-4 shadow-sm"> 
         
-        <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <header class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 panel-header">
           <h4 class="fw-bold m-0 text-dark">Denuncias Arquivadas</h4>
-          <small class="text-muted">Clique em qualquer linha para ver o histórico completo do animal</small>
+          <small class="text-muted header-hint">Clique em qualquer linha para ver o histórico completo do animal</small>
         </header>
 
         <div class="table-responsive bg-white rounded-4 shadow-sm p-2">
@@ -75,7 +75,8 @@ defineEmits(['selecionarHistorico']);
   --bs-table-bg: transparent; 
 }
 .table-responsive { 
-  max-height: 400px; 
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .rounded-4 { 
   border-radius: 0.9rem; 
@@ -90,12 +91,33 @@ defineEmits(['selecionarHistorico']);
   border-radius: 999px; 
 }
 
+.header-hint {
+  max-width: 420px;
+  text-align: right;
+}
+
+@media (min-width: 992px) {
+  .table-responsive {
+    max-height: min(60vh, 560px);
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .table-responsive {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
+
 @media (max-width: 767.98px) {
   .archived-card {
     padding: 1rem !important;
   }
 
-  header small {
+  .header-hint {
+    max-width: none;
+    text-align: left;
     font-size: 0.75rem;
   }
 }
