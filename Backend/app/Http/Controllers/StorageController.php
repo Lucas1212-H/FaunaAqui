@@ -16,15 +16,15 @@ class StorageController extends Controller
      */
     public function serve(string $path)
     {
-        // Caminho real dentro de storage/app/public/
-        $filePath = 'public/' . $path;
+        // Se o caminho vier com 'public/' no início, removemos para evitar duplicidade no disco 'public'
+        $cleanPath = preg_replace('/^public\//', '', $path);
 
-        if (!Storage::exists($filePath)) {
+        if (!Storage::disk('public')->exists($cleanPath)) {
             abort(404, 'Arquivo não encontrado.');
         }
 
-        $file     = Storage::get($filePath);
-        $mimeType = Storage::mimeType($filePath) ?: 'application/octet-stream';
+        $file     = Storage::disk('public')->get($cleanPath);
+        $mimeType = Storage::disk('public')->mimeType($cleanPath) ?: 'application/octet-stream';
 
         return response($file, 200)
             ->header('Content-Type', $mimeType)

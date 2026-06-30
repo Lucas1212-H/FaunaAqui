@@ -70,17 +70,20 @@ const usuario = reactive({
   password: ''
 })
 
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+const API_BASE_URL = isLocal ? 'http://localhost:8000/api' : 'https://conviva-labev.onrender.com/api'
+
 const lidarComCadastro = async () => {
   try {
     carregando.value = true
     erroMensagem.value = ''
 
-    await axios.post('http://localhost:8000/api/registrar', usuario)
+    await axios.post(`${API_BASE_URL}/registrar`, usuario)
     cadastroSolicitado.value = true // Exibe o aviso de e-mail enviado
 
   } catch (error) {
     console.error(error)
-    erroMensagem.value = error.response?.data?.message || 'Erro ao processar cadastro local.'
+    erroMensagem.value = error.response?.data?.message || 'Erro ao processar cadastro.'
   } finally {
     carregando.value = false
   }

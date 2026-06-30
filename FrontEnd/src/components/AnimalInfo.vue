@@ -30,7 +30,7 @@
           <aside class="info-card media-card" aria-label="Imagem da espécie">
             <img
               class="animal-image"
-              :src="animal.foto ? `http://localhost:8000/storage/${animal.foto}` : 'https://picsum.photos/seed/fauna/400/300'"
+              :src="animal.foto ? `${storageBaseUrl}/${animal.foto.replace(/^public\//, '')}` : 'https://picsum.photos/seed/fauna/400/300'"
               :alt="`Imagem de ${animal.nome_popular}`"
             />
           </aside>
@@ -113,7 +113,8 @@ export default {
         carregando: true, // começa verdadeira para esperar o banco responder
         animal: null, // aqui guardará os dados do animal
     mapaInstance: null,
-    erro: null
+    erro: null,
+    storageBaseUrl: isLocal ? 'http://localhost:8000/storage' : 'https://conviva-labev.onrender.com/storage'
     }
   },
   computed: {

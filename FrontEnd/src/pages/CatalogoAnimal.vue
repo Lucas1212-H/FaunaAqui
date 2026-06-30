@@ -282,11 +282,7 @@ export default {
       
       const nomeLimpo = nomeArquivo.replace(/^public\//, '');
       
-      if (isLocal) {
-        return `${API_BASE_URL}/storage/${nomeLimpo}`;
-      }
-      
-      return `${API_BASE_URL}/api/imagens/${nomeLimpo}`;
+      return `${API_BASE_URL}/storage/${nomeLimpo}`;
     },
 
     async buscarDadosDoCatalogo() {
