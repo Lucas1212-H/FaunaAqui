@@ -202,15 +202,16 @@ const salvarPost = async () => {
 
     let response
     if (emEdicao.value) {
-      // Nota: O Laravel às vezes exige método POST com alteração de rota (_method = PUT) para processar arquivos em updates.
-      formData.append('_method', 'PUT')
-      response = await axios.post(`${API_BASE_URL}/api/posts/${idPostSelecionado.value}`, formData, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
-        }
-      })
-    } else {
+  // O Laravel exige _method = PUT ao enviar arquivos via POST em formulários multipartes
+    formData.append('_method', 'PUT')
+    response = await axios.post(`${API_BASE_URL}/api/posts/${idPostSelecionado.value}`, formData, {
+    headers: { 
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'multipart/form-data'
+    }
+  })
+}
+ else {
       response = await axios.post(`${API_BASE_URL}/api/posts`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
