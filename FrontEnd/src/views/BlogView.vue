@@ -67,7 +67,7 @@
             </span>
 
             <img 
-              :src="resolveStorageUrl(post.imagem_url, FALLBACK_POST_IMAGE)" 
+              :src="post.imagem_url || FALLBACK_POST_IMAGE"
               class="card-img-top rounded-0 border-bottom" 
               style="height: 240px; object-fit: cover;"
               alt="Capa da publicação"
