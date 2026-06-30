@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\Ocorrencia;
 use App\Support\StorageUrl;
 use Illuminate\Http\Request;
@@ -28,8 +29,13 @@ class OcorrenciaController extends Controller
 
         $fotoPath = null;
         if ($request->hasFile('foto')) {
-            $fotoPath = $request->file('foto')->store('ocorrencias', 'public');
+            $resultadoUpload = Cloudinary::upload($request->file('foto')->getRealPath(), [
+                'folder' => 'conviva'
+            ]);
+            $fotoPath = $resultadoUpload->getSecurePath(); 
         }
+
+
 
         $ocorrencia = Ocorrencia::create([
             'denunciante_nome'          => $request->denunciante_nome,
