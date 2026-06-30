@@ -6,6 +6,8 @@ use App\Models\Post;
 use App\Support\StorageUrl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+
 class PostController extends Controller
 {
     public function index()
@@ -23,7 +25,7 @@ class PostController extends Controller
             ], 500);
         }
     }
-
+    
     public function update(Request $request, $id)
     {
         if (auth()->user()->tipo_conta !== 'Administrador') {
@@ -44,18 +46,10 @@ class PostController extends Controller
 
             // Se uma NOVA imagem foi enviada
             if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-                
-                if ($post->imagem_url) {
-                    $nomeArquivo = StorageUrl::pathFromUrl($post->getRawOriginal('imagem_url'));
-                    if ($nomeArquivo) {
-                        Storage::disk('public')->delete($nomeArquivo);
-                    }
-                }
-
-                // Salva a nova imagem
-                $arquivo = $request->file('imagem');
-                $caminho = $arquivo->store('posts', 'public');
-                $post->imagem_url = asset('storage/' . $caminho);
+                $resultadoUpload = Cloudinary::upload($request->file('imagem')->getRealPath(), [
+                    'folder' => 'posts'
+                ]);
+                $post->imagem_url = $resultadoUpload->getSecurePath();
             }
 
             // Atualiza os outros campos
@@ -128,13 +122,10 @@ class PostController extends Controller
 
             // Processamento do arquivo físico de imagem
             if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-                $arquivo = $request->file('imagem');
-                
-                // Salva na pasta storage/app/public/posts
-                $caminho = $arquivo->store('posts', 'public');
-                
-                // Gera a URL pública
-                $dados['imagem_url'] = asset('storage/' . $caminho);
+                $resultadoUpload = Cloudinary::upload($request->file('imagem')->getRealPath(), [
+                    'folder' => 'posts'
+                ]);
+                $dados['imagem_url'] = $resultadoUpload->getSecurePath();
             }
 
             // Cria o registro no banco
