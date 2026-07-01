@@ -5,6 +5,7 @@ namespace App\Services;
 use Cloudinary\Api\Exception\ApiError;
 use Cloudinary\Cloudinary;
 use Illuminate\Http\UploadedFile;
+use App\Support\StorageUrl;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
@@ -109,7 +110,7 @@ class CloudinaryService
             return;
         }
 
-        $nomeArquivo = str_replace(asset('storage/'), '', $url);
+        $nomeArquivo = StorageUrl::pathFromUrl($url) ?? str_replace(asset('storage/'), '', $url);
         if ($nomeArquivo && Storage::disk('public')->exists($nomeArquivo)) {
             Storage::disk('public')->delete($nomeArquivo);
         }

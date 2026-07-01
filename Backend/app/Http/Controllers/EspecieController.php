@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Especie;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class EspecieController extends Controller
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function index(Request $request)
     {
         $query = Especie::with(['categoria:id_categoria,nome_popular,nome_cientifico,foto'])
@@ -32,10 +34,8 @@ class EspecieController extends Controller
             'id_categoria' => ['required', 'integer', 'exists:categorias,id_categoria'],
         ]);
 
-        // Se houver foto, fazer upload
         if ($request->hasFile('foto')) {
-            $caminhoFoto = $request->file('foto')->store('especies', 'public');
-            $dados['foto'] = $caminhoFoto;
+            $dados['foto'] = $this->cloudinary->upload($request->file('foto'), 'especies');
         }
 
         $especie = Especie::create($dados);
@@ -49,8 +49,8 @@ class EspecieController extends Controller
             'categoria:id_categoria,nome_popular,nome_cientifico,foto',
             'ocorrencias' => function ($query) {
                 $query->select('id', 'especie_id', 'latitude', 'longitude', 'situacao_animal', 'ponto_referencia', 'created_at');
-            }
-            ])
+            },
+        ])
             ->where('id_especie', $id)
             ->first();
 
@@ -82,15 +82,9 @@ class EspecieController extends Controller
             'id_categoria' => ['required', 'integer', 'exists:categorias,id_categoria'],
         ]);
 
-        // Se houver foto, fazer upload
         if ($request->hasFile('foto')) {
-            // Deletar foto antiga se existir
-            if ($especie->foto && Storage::disk('public')->exists($especie->foto)) {
-                Storage::disk('public')->delete($especie->foto);
-            }
-            
-            $caminhoFoto = $request->file('foto')->store('especies', 'public');
-            $dados['foto'] = $caminhoFoto;
+            $this->cloudinary->deleteByUrl($especie->getRawOriginal('foto'));
+            $dados['foto'] = $this->cloudinary->upload($request->file('foto'), 'especies');
         }
 
         $especie->update($dados);
@@ -106,10 +100,12 @@ class EspecieController extends Controller
             return response()->json(['message' => 'Espécie não encontrada'], 404);
         }
 
+        $this->cloudinary->deleteByUrl($especie->getRawOriginal('foto'));
         $especie->delete();
 
         return response()->json(['message' => 'Espécie excluída com sucesso']);
     }
+
     public function vincularOcorrencias(Request $request, int $id)
     {
         $especie = Especie::where('id_especie', $id)->first();

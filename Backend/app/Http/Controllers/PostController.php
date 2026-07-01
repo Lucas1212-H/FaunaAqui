@@ -54,7 +54,7 @@ class PostController extends Controller
             ]);
 
             if ($request->hasFile('imagem') && $request->file('imagem')->isValid()) {
-                $this->cloudinary->deleteByUrl($post->imagem_url);
+                $this->cloudinary->deleteByUrl($post->getRawOriginal('imagem_url'));
                 $post->imagem_url = $this->cloudinary->upload($request->file('imagem'), 'posts');
             }
 
@@ -87,7 +87,7 @@ class PostController extends Controller
 
         try {
             $post = Post::findOrFail($id);
-            $this->cloudinary->deleteByUrl($post->imagem_url);
+            $this->cloudinary->deleteByUrl($post->getRawOriginal('imagem_url'));
             $post->delete();
 
             return response()->json(['message' => 'Publicação excluída com sucesso!'], 200);

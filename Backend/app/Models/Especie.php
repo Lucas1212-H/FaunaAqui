@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Support\StorageUrl;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use App\Models\Ocorrencia;
+
 class Especie extends Model
 {
     protected $table = 'especies';
@@ -27,8 +29,14 @@ class Especie extends Model
 
     public function ocorrencias(): HasMany
     {
-        // estrutura que o Laravel exige:
-        // hasMany(ModelRelacionado, 'chave_estrangeira_na_tabela_relacionada', 'chave_primaria_na_tabela_atual')
         return $this->hasMany(Ocorrencia::class, 'especie_id', 'id_especie');
+    }
+
+    protected function foto(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => StorageUrl::publicUrl($value),
+            set: fn (?string $value) => $value,
+        );
     }
 }

@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Categoria;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Facades\Storage;
 
 class CategoriaController extends Controller
 {
+    public function __construct(private CloudinaryService $cloudinary) {}
+
     public function index()
     {
         return response()->json(
@@ -37,10 +39,8 @@ class CategoriaController extends Controller
             'foto' => ['nullable', 'image', 'mimes:jpeg,png,gif,webp', 'max:5120'],
         ]);
 
-        // Se houver foto, fazer upload
         if ($request->hasFile('foto')) {
-            $caminhoFoto = $request->file('foto')->store('categorias', 'public');
-            $dados['foto'] = $caminhoFoto;
+            $dados['foto'] = $this->cloudinary->upload($request->file('foto'), 'categorias');
         }
 
         $categoria = Categoria::create($dados);
@@ -50,7 +50,6 @@ class CategoriaController extends Controller
 
     public function update(Request $request, int $id)
     {
-        // Busca usando a sua chave personalizada do banco
         $categoria = Categoria::where('id_categoria', $id)->first();
 
         if (! $categoria) {
@@ -62,28 +61,19 @@ class CategoriaController extends Controller
                 'required',
                 'string',
                 'max:255',
-                // Corrigido e validado para ignorar o ID correto usando sua coluna customizada
                 Rule::unique('categorias', 'nome_cientifico')->ignore($id, 'id_categoria'),
             ],
             'nome_popular' => ['required', 'string', 'max:255'],
-            'foto' => ['nullable', 'image', 'mimes:jpeg,png,gif,webp', 'max:5120'], // Limite de 5MB seguro
+            'foto' => ['nullable', 'image', 'mimes:jpeg,png,gif,webp', 'max:5120'],
         ]);
 
-        // Se houver nova foto, faz o gerenciamento do upload
         if ($request->hasFile('foto')) {
-            // Deleta a imagem antiga do disco local para não acumular lixo digital
-            if ($categoria->foto && Storage::disk('public')->exists($categoria->foto)) {
-                Storage::disk('public')->delete($categoria->foto);
-            }
-            
-            $caminhoFoto = $request->file('foto')->store('categorias', 'public');
-            $dados['foto'] = $caminhoFoto;
+            $this->cloudinary->deleteByUrl($categoria->getRawOriginal('foto'));
+            $dados['foto'] = $this->cloudinary->upload($request->file('foto'), 'categorias');
         }
 
-        // Executa a atualização dos campos validados no banco de dados
         $categoria->update($dados);
 
-        // Retorna a categoria atualizada com o contador de espécies atualizado para o Vue.js
         return response()->json($categoria->fresh()->loadCount('especies'));
     }
 
@@ -95,6 +85,7 @@ class CategoriaController extends Controller
             return response()->json(['message' => 'Categoria não encontrada'], 404);
         }
 
+        $this->cloudinary->deleteByUrl($categoria->getRawOriginal('foto'));
         $categoria->delete();
 
         return response()->json(['message' => 'Categoria excluída com sucesso']);
