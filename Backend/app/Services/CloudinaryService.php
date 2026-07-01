@@ -33,14 +33,21 @@ class CloudinaryService
                 );
             }
 
-            $config = config('cloudinary.url')
-                ?: [
+            $cloudName = config('cloudinary.cloud_name');
+            $apiKey = config('cloudinary.api_key');
+            $apiSecret = config('cloudinary.api_secret');
+
+            if ($cloudName && $apiKey && $apiSecret) {
+                $config = [
                     'cloud' => [
-                        'cloud_name' => config('cloudinary.cloud_name'),
-                        'api_key' => config('cloudinary.api_key'),
-                        'api_secret' => config('cloudinary.api_secret'),
+                        'cloud_name' => $cloudName,
+                        'api_key' => $apiKey,
+                        'api_secret' => $apiSecret,
                     ],
                 ];
+            } else {
+                $config = config('cloudinary.url');
+            }
 
             $this->client = new Cloudinary($config);
         }
@@ -52,10 +59,23 @@ class CloudinaryService
     {
         $folder = trim(config('cloudinary.folder').'/'.$subfolder, '/');
 
-        $result = $this->getClient()->uploadApi()->upload(
-            $file->getRealPath(),
-            ['folder' => $folder]
-        );
+        try {
+            $result = $this->getClient()->uploadApi()->upload(
+                $file->getRealPath(),
+                ['folder' => $folder]
+            );
+        } catch (ApiError $e) {
+            $message = $e->getMessage();
+            if (str_contains($message, 'cloud_name')) {
+                throw new RuntimeException(
+                    'Cloud name inválido (atual: "'.config('cloudinary.cloud_name').'"). '
+                    .'Copie o Cloud name exato em console.cloudinary.com → Dashboard → Product environment credentials.',
+                    previous: $e
+                );
+            }
+
+            throw $e;
+        }
 
         return $result['secure_url'];
     }
