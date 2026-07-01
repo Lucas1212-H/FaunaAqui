@@ -15,7 +15,7 @@ class CloudinaryService
 
     public function isConfigured(): bool
     {
-        if (! empty(env('CLOUDINARY_URL'))) {
+        if (! empty(config('cloudinary.url'))) {
             return true;
         }
 
@@ -29,13 +29,12 @@ class CloudinaryService
         if ($this->client === null) {
             if (! $this->isConfigured()) {
                 throw new RuntimeException(
-                    'Cloudinary não configurado. Defina CLOUDINARY_URL ou CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY e CLOUDINARY_API_SECRET no .env'
+                    'Cloudinary não configurado. Defina CLOUDINARY_URL ou CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY e CLOUDINARY_API_SECRET.'
                 );
             }
 
-            $config = env('CLOUDINARY_URL')
-                ? env('CLOUDINARY_URL')
-                : [
+            $config = config('cloudinary.url')
+                ?: [
                     'cloud' => [
                         'cloud_name' => config('cloudinary.cloud_name'),
                         'api_key' => config('cloudinary.api_key'),
