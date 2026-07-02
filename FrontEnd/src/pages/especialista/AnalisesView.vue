@@ -5,9 +5,6 @@
         <h1 class="h3 fw-bold text-uppercase m-0 text-dark">Painel Analítico ConViva</h1>
         <p class="text-muted small m-0">Inteligência geográfica e estatística aplicada à conservação da fauna.</p>
       </div>
-      <div class="text-end d-none d-md-block">
-        <span class="badge bg-dark rounded-0 px-3 py-2 text-uppercase">Produção Real</span>
-      </div>
     </header>
 
     <div class="row g-3 mb-4">
@@ -49,7 +46,7 @@
             <h2 class="h6 fw-bold text-uppercase m-0">Mapa de Densidade (Hotspots)</h2>
             <span class="small text-muted">Concentração geográfica de aparições</span>
           </div>
-          <div id="mapAnalise" style="height: 450px; z-index: 1;"></div>
+          <div ref="mapAnaliseEl" style="height: 450px; z-index: 1;"></div>
         </div>
       </div>
 
@@ -83,6 +80,7 @@ const API_BASE_URL = isLocal ? 'http://localhost:8000' : 'https://conviva-labev.
 
 const dadosBrutos = ref([])
 const carregando = ref(true)
+const mapAnaliseEl = ref(null)
 let mapInstance = null
 
 const totalEspecies = computed(() => new Set(dadosBrutos.value.map(d => d.especie)).size)
@@ -120,12 +118,16 @@ function contarPorPropriedade(prop) {
 }
 
 const initMapAnalise = () => {
+  if (!mapAnaliseEl.value) return
+
   if (mapInstance) mapInstance.remove()
 
-  mapInstance = L.map('mapAnalise').setView([-1.45, -48.48], 12)
+  mapInstance = L.map(mapAnaliseEl.value).setView([-1.45, -48.48], 12)
   L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png').addTo(mapInstance)
 
-  const heatData = dadosBrutos.value.map(d => [d.lat, d.lng, 0.5]) // [lat, lng, intensidade]
+  const heatData = dadosBrutos.value
+    .filter(d => Number.isFinite(d.lat) && Number.isFinite(d.lng))
+    .map(d => [d.lat, d.lng, 0.5]) // [lat, lng, intensidade]
 
   if (heatData.length > 0) {
     L.heatLayer(heatData, {
@@ -142,14 +144,14 @@ const carregarDadosAnalise = async () => {
     carregando.value = true
     const response = await axios.get(`${API_BASE_URL}/api/analise/ocorrencias`)
     dadosBrutos.value = response.data
-    
-    await nextTick()
-    initMapAnalise()
   } catch (error) {
     console.error('Erro ao carregar dados:', error)
   } finally {
     carregando.value = false
   }
+
+  await nextTick()
+  initMapAnalise()
 }
 
 onMounted(() => {
