@@ -29,6 +29,12 @@
         <button
           type="button"
           class="nav-item-link nav-button"
+          :class="{ active: abaAtiva === 'analises' }"
+          @click="selecionarAba('analises')"
+        >Análises</button>
+        <button
+          type="button"
+          class="nav-item-link nav-button"
           :class="{ active: abaAtiva === 'postagens' }"
           @click="selecionarAba('postagens')"
         >Postagens</button>

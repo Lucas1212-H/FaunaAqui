@@ -33,6 +33,10 @@
           v-else-if="abaAtiva === 'publicados'"
           :publicados="publicadosLista"
         />
+
+        <AnalisesView
+          v-else-if="abaAtiva === 'analises'"
+        />
       </div>
     </div>
 
@@ -65,6 +69,7 @@ import ModalHistoricoAnimal from '@/components/especialista/ModalHistoricoAnimal
 import TriagemPainel from '@/pages/especialista/TriagemPainel.vue';
 import HistoricoPainel from '@/pages/especialista/HistoricoPainel.vue';
 import PublicadosPainel from '@/pages/especialista/PublicadosPainel.vue';
+import AnalisesView from '@/pages/especialista/AnalisesView.vue';
 import { exportarLaudoOcorrencia } from '@/utils/exportLaudo';
 import { resolveStorageUrl } from '@/utils/mediaUrl';
 
@@ -74,7 +79,7 @@ const selectedDenuncia = ref(null);
 const historicoSelecionado = ref(null);
 const route = useRoute();
 const router = useRouter();
-const abasValidas = new Set(['triagem', 'arquivadas', 'publicados']);
+const abasValidas = new Set(['triagem', 'arquivadas', 'publicados', 'analises']);
 const normalizarAba = (valor) => (abasValidas.has(String(valor)) ? String(valor) : 'triagem');
 const abaAtiva = ref(normalizarAba(route.query.aba));
 const carregando = ref(true);

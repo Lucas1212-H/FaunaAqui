@@ -121,3 +121,5 @@ Route::get('/configurar-producao', function () {
         ], 500);
     }
 });
+
+Route::get('/analise/ocorrencias', [OcorrenciaController::class, 'dadosParaAnalise']);

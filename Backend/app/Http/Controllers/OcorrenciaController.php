@@ -263,4 +263,29 @@ class OcorrenciaController extends Controller
     {
         return $this->indexPendentes();
     }
+
+    public function dadosParaAnalise()
+    {
+        try {
+            $dados = Ocorrencia::where('status', 'Publicado')
+                ->select('tipo_animal', 'situacao_animal', 'latitude', 'longitude', 'created_at')
+                ->get()
+                ->map(fn ($item) => [
+                    'especie' => $item->tipo_animal,
+                    'situacao' => $item->situacao_animal,
+                    'situacao_animal' => $item->situacao_animal,
+                    'lat' => $item->latitude !== null ? (float) $item->latitude : null,
+                    'lng' => $item->longitude !== null ? (float) $item->longitude : null,
+                    'latitude' => $item->latitude,
+                    'longitude' => $item->longitude,
+                    'ano' => $item->created_at->format('Y'),
+                    'mes' => $item->created_at->format('m'),
+                    'hora' => $item->created_at->format('H'),
+                ]);
+
+            return response()->json($dados, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao processar dados: ' . $e->getMessage()], 500);
+        }
+    }
 }
