@@ -268,10 +268,11 @@ class OcorrenciaController extends Controller
     {
         try {
             $dados = Ocorrencia::where('status', 'Publicado')
-                ->select('tipo_animal', 'situacao_animal', 'latitude', 'longitude', 'created_at')
+                ->select('tipo_animal', 'distincao_biologica', 'situacao_animal', 'latitude', 'longitude', 'created_at')
                 ->get()
                 ->map(fn ($item) => [
                     'especie' => $item->tipo_animal,
+                    'distincao_biologica' => $item->distincao_biologica,
                     'situacao' => $item->situacao_animal,
                     'situacao_animal' => $item->situacao_animal,
                     'lat' => $item->latitude !== null ? (float) $item->latitude : null,
